@@ -6,7 +6,7 @@ import re
 import io
 
 # --- Gemini API Key Configuration ---
-GEMINI_API_KEY = "AIzaSyAqko3NqGS-GtXhzm8LeiZ3xUEyo_XIqLo" # As provided by user
+GEMINI_API_KEY = "[]" # As provided by user
 genai.configure(api_key=GEMINI_API_KEY)
 
 generation_config = {
