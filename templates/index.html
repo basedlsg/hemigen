@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hemi-Sync Meditation Generator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #2c3e50; /* Darker background for IDE feel */
+            color: #ecf0f1; /* Light text for contrast */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #34495e; /* Slightly lighter container */
+            padding: 25px 35px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 700px;
+            border: 1px solid #4a6572;
+        }
+        h1 {
+            color: #1abc9c; /* Accent color */
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 300;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #bdc3c7; /* Lighter label color */
+        }
+        input[type="text"], input[type="number"] {
+            width: calc(100% - 24px);
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #4a6572;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: #2c3e50; /* Input background */
+            color: #ecf0f1; /* Input text color */
+        }
+        input[type="submit"] {
+            background-color: #1abc9c;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+        input[type="submit"]:hover {
+            background-color: #16a085;
+        }
+        input[type="submit"]:disabled {
+            background-color: #7f8c8d;
+            cursor: not-allowed;
+        }
+        .message-area {
+            margin-top: 25px;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .error {
+            background-color: #e74c3c;
+            color: #fff;
+            border: 1px solid #c0392b;
+        }
+        .success {
+            background-color: #2ecc71;
+            color: #fff;
+            border: 1px solid #27ae60;
+        }
+        .download-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .download-link:hover {
+            background-color: #2980b9;
+        }
+        .loader {
+            border: 5px solid #7f8c8d; /* Loader border */
+            border-top: 5px solid #1abc9c; /* Loader accent */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none; /* Hidden by default */
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #console-output {
+            background-color: #1e2b37; /* Darker console */
+            color: #d0d0d0; /* Lighter console text */
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            border: 1px solid #4a6572;
+        }
+        #console-output p {
+            margin: 0 0 5px 0;
+            white-space: pre-wrap; /* Preserve whitespace */
+        }
+        .console-line-enter {
+            opacity: 0;
+            transform: translateY(10px);
+            animation: lineEnter 0.3s forwards;
+        }
+        @keyframes lineEnter {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ZenithFlow AI Meditation Forge</h1>
+        
+        <form id="meditationForm">
+            <div>
+                <label for="goal">Meditation Goal:</label>
+                <input type="text" id="goal" name="goal" value="Finding peace in Seattle" required>
+            </div>
+            <div>
+                <label for="duration">Duration (minutes, 5-60):</label>
+                <input type="number" id="duration" name="duration" min="5" max="60" value="20" required>
+            </div>
+            <input type="submit" id="submitButton" value="Forge Meditation">
+        </form>
+
+        <div id="loader" class="loader"></div>
+        <div id="messageArea" class="message-area"></div>
+        
+        <div id="console-output-container" style="display: none;">
+            <h3>Generation Log:</h3>
+            <div id="console-output"></div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('meditationForm');
+        const submitButton = document.getElementById('submitButton');
+        const loader = document.getElementById('loader');
+        const messageArea = document.getElementById('messageArea');
+        const consoleOutputContainer = document.getElementById('console-output-container');
+        const consoleOutput = document.getElementById('console-output');
+
+        const simulatedLogMessages = [
+            "Initiating meditation forging sequence...",
+            "Connecting to AI consciousness stream (Gemini)...",
+            "Analyzing goal parameters...",
+            "Generating core script segments...",
+            "Phase 1: Relaxation induction script... OK",
+            "Phase 2: Goal-focused narrative script... OK",
+            "Phase 3: Return to awareness script... OK",
+            "Script compilation complete.",
+            "Initializing ElevenLabs vocal harmonizer...",
+            "Selecting voice profile: Celestial Guide (ID: 7nFoun39JV8WgdJ3vGmC)...",
+            "Synthesizing audio segments... (this may take a moment)",
+            "Segment 1/N... Synthesized.",
+            "Segment 2/N... Synthesized.",
+            "Segment .../N... Synthesized.",
+            "Vocal track fully synthesized.",
+            "Loading background Hemi-Sync frequencies...",
+            "Calibrating audio levels...",
+            "Mixing vocal track with background audio...",
+            "Finalizing MP3 output stream...",
+            "Meditation forged successfully!"
+        ];
+
+        let logInterval;
+
+        function appendToConsole(message, isFinal) {
+            const p = document.createElement('p');
+            p.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            p.classList.add('console-line-enter');
+            consoleOutput.appendChild(p);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight; // Auto-scroll
+        }
+
+        function startSimulatedLog(onComplete) {
+            consoleOutput.innerHTML = ''; // Clear previous logs
+            consoleOutputContainer.style.display = 'block';
+            let i = 0;
+            logInterval = setInterval(() => {
+                if (i < simulatedLogMessages.length) {
+                    appendToConsole(simulatedLogMessages[i]);
+                    i++;
+                } else {
+                    clearInterval(logInterval);
+                    if (onComplete) onComplete(); 
+                }
+            }, 700); // Adjust delay for desired speed
+        }
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            messageArea.innerHTML = ''; // Clear previous messages
+            loader.style.display = 'block';
+            submitButton.disabled = true;
+            submitButton.value = 'Forging...';
+
+            const formData = new FormData(form);
+            
+            startSimulatedLog(async () => {
+                // This callback runs after simulated log finishes OR if backend is faster
+                // However, we want the fetch to run in parallel with the log
+            });
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                clearInterval(logInterval); // Stop simulated log if backend finishes first
+                
+                if (response.ok && data.status === 'success') {
+                    appendToConsole(`Server: Meditation \"${data.filename}\" created.`);
+                    appendToConsole(`Server: Download URL: ${data.download_url}`);
+                    messageArea.innerHTML = `
+                        <div class="message success">
+                            <p>Meditation "${data.filename}" forged successfully!</p>
+                            <a href="${data.download_url}" class="download-link">Download MP3</a>
+                        </div>`;
+                } else {
+                    appendToConsole(`Server ERROR: ${data.message || 'Unknown error'}`);
+                    messageArea.innerHTML = `<div class="message error"><p><strong>Error:</strong> ${data.message || 'Failed to generate meditation.'}</p></div>`;
+                }
+            } catch (error) {
+                clearInterval(logInterval); // Stop simulated log on network error
+                appendToConsole(`Client ERROR: ${error.toString()}`);
+                messageArea.innerHTML = `<div class="message error"><p><strong>Network Error:</strong> Could not connect to the server. ${error.toString()}</p></div>`;
+            }
+
+            loader.style.display = 'none';
+            submitButton.disabled = false;
+            submitButton.value = 'Forge Meditation';
+        });
+    </script>
+</body>
+</html> 

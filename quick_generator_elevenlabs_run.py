@@ -212,35 +212,63 @@ def create_meditation_mp3_elevenlabs(script_text, background_audio_path, output_
         print(f"Error exporting MP3 \'{full_output_path}\': {e}")
         return None
 
-if __name__ == "__main__":
-    user_input_goal = "experience profound mental clarity" # New goal for testing
-    total_duration_minutes = 25 # Different duration
-    
-    print(f"Autonomous run for goal: \'{user_input_goal}\', duration: {total_duration_minutes} min (using ElevenLabs)")
+# --- Constants for generation ---
+BACKGROUND_FILE = "Focus-Creation/background_audio/y2mate.is - Robert Monroe Institute Astral Projection Gateway Process 40 minutes no talking -edB7QI8I02c-192k-1700669353.mp3"
+ESTIMATED_FIXED_PARTS_DURATION = 5 # minutes
 
-    estimated_fixed_parts_duration = 5 
-    main_content_gen_duration = total_duration_minutes - estimated_fixed_parts_duration
+# --- New Main Orchestration Function ---
+def generate_complete_meditation(user_goal, total_duration_minutes):
+    """
+    Generates a complete meditation MP3 based on user goal and duration.
+    Returns the path to the generated MP3 file or None if failed.
+    """
+    print(f"Starting meditation generation for goal: '{user_goal}', duration: {total_duration_minutes} min (using ElevenLabs)")
+
+    main_content_gen_duration = total_duration_minutes - ESTIMATED_FIXED_PARTS_DURATION
     if main_content_gen_duration < 1:
-         main_content_gen_duration = 1
+         main_content_gen_duration = 1 # Ensure at least 1 minute for main content
     
-    BACKGROUND_FILE = "Focus-Creation/background_audio/y2mate.is - Robert Monroe Institute Astral Projection Gateway Process 40 minutes no talking -edB7QI8I02c-192k-1700669353.mp3"
-    
-    run_generation = False
+    # Pre-run checks (simplified for function context, more robust checks can be added)
     if not ELEVENLABS_API_KEY or not ELEVENLABS_VOICE_ID:
-        print("ERROR: ElevenLabs API Key or Voice ID not configured in the script.")
-    elif elevenlabs_client is None: # Check if client initialized
-        print("ERROR: ElevenLabs client failed to initialize. Cannot proceed.")
-    elif not os.path.exists(BACKGROUND_FILE):
-        print(f"ERROR: Background audio file not found at \'{BACKGROUND_FILE}\'. Please check the path.")
-    elif not BACKGROUND_FILE.lower().endswith(".mp3"):
-        print(f"ERROR: Background audio file \'{BACKGROUND_FILE}\' does not seem to be an MP3. Please check the file format.")
-    else:
-        run_generation = True
+        print("ERROR: ElevenLabs API Key or Voice ID not configured.")
+        return None
+    if elevenlabs_client is None:
+        print("ERROR: ElevenLabs client failed to initialize.")
+        return None
+    if not os.path.exists(BACKGROUND_FILE):
+        print(f"ERROR: Background audio file not found at '{BACKGROUND_FILE}'.")
+        return None
+    if not BACKGROUND_FILE.lower().endswith(".mp3"):
+        print(f"ERROR: Background audio file '{BACKGROUND_FILE}' is not an MP3.")
+        return None
 
-    if run_generation:
-        print(f"Generating script for \'{user_input_goal}\' (main content approx. {main_content_gen_duration} min)...")
-        script = generate_meditation_script_gemini_v1(user_input_goal, main_content_gen_duration)
-        output_mp3_filename = f"custom_elevenlabs_{user_input_goal.replace(' ', '_')[:20]}_{total_duration_minutes}min.mp3"
-        create_meditation_mp3_elevenlabs(script, BACKGROUND_FILE, output_mp3_filename)
+    print(f"Generating script for '{user_goal}' (main content approx. {main_content_gen_duration} min)...")
+    script = generate_meditation_script_gemini_v1(user_goal, main_content_gen_duration)
+    
+    if "[AI GENERATION FAILED:" in script:
+        print("Failed to generate script content from AI. Aborting.")
+        return None
+        
+    output_mp3_filename = f"custom_elevenlabs_{user_goal.replace(' ', '_').replace('[^a-zA-Z0-9_.]', '')[:30]}_{total_duration_minutes}min.mp3"
+    
+    mp3_path = create_meditation_mp3_elevenlabs(script, BACKGROUND_FILE, output_mp3_filename)
+    
+    if mp3_path:
+        print(f"Meditation generation complete. Output: {mp3_path}")
     else:
-        print("Pre-run checks failed. Meditation generation aborted.") 
+        print("Meditation generation failed.")
+    return mp3_path
+
+if __name__ == "__main__":
+    # Default values for direct script execution (testing)
+    user_input_goal = "imagining I'm receiving $90k" 
+    total_duration_minutes = 20
+    
+    print(f"Executing direct run for goal: '{user_input_goal}', duration: {total_duration_minutes} min")
+    
+    output_file = generate_complete_meditation(user_input_goal, total_duration_minutes)
+    
+    if output_file:
+        print(f"Successfully generated: {output_file}")
+    else:
+        print("Failed to generate meditation in direct run.") 
