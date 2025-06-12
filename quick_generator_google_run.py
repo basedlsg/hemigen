@@ -210,10 +210,11 @@ def create_meditation_mp3_google_tts(script_text, background_audio_path, output_
 if __name__ == "__main__":
     run_generation = False # Flag to control execution after checks
     
-    user_input_goal = "achieve deep relaxation and inner calm"
-    total_duration_minutes = 20
+    # Example goal as requested by the user
+    user_input_goal = "imagining I'm receiving $90k" 
+    total_duration_minutes = 20 # You can adjust this as needed
     
-    print(f"Autonomous run for goal: '{user_input_goal}', duration: {total_duration_minutes} min")
+    print(f"Generating meditation for goal: '{user_input_goal}', duration: {total_duration_minutes} min")
 
     estimated_fixed_parts_duration = 5
     main_content_gen_duration = total_duration_minutes - estimated_fixed_parts_duration
