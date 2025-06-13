@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Meditation Generator - Hemi-Sync Style</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --bg-dark: #111827;
+            --bg-light: #1f2937;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --border: #374151;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--bg-light);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            width: 100%;
+            max-width: 800px;
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        textarea, input[type="number"] {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.5;
+        }
+
+        textarea:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        .button {
+            width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.5);
+        }
+
+        .button:disabled {
+            background: var(--border);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-section {
+            margin-top: 40px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--bg-dark);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .log-container {
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
+            line-height: 1.6;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .log-time {
+            color: var(--text-secondary);
+            margin-right: 8px;
+        }
+
+        .log-message {
+            color: var(--text-primary);
+        }
+
+        .log-error {
+            color: var(--error);
+        }
+
+        .log-success {
+            color: var(--secondary);
+        }
+
+        .results-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .result-card {
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .result-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--secondary);
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .download-btn {
+            padding: 10px 20px;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .download-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .download-btn.secondary {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border);
+        }
+
+        .download-btn.secondary:hover {
+            background-color: var(--border);
+        }
+
+        .examples {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--bg-dark);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .examples h3 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+        }
+
+        .example-list {
+            list-style: none;
+        }
+
+        .example-list li {
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .example-list li:hover {
+            color: var(--primary);
+        }
+
+        .example-list li:before {
+            content: "→ ";
+            color: var(--primary);
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Meditation Generator</h1>
+        <p class="subtitle">Create custom Hemi-Sync style meditations with advanced AI</p>
+
+        <form id="meditationForm">
+            <div class="form-group">
+                <label for="scenario">Describe your meditation scenario or goal:</label>
+                <textarea 
+                    id="scenario" 
+                    name="scenario" 
+                    placeholder="Example: I want to manifest financial abundance and receive $90,000 to achieve my dreams..."
+                    required
+                ></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="duration">Duration (minutes):</label>
+                <input 
+                    type="number" 
+                    id="duration" 
+                    name="duration" 
+                    min="10" 
+                    max="60" 
+                    value="25" 
+                    required
+                >
+            </div>
+
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="generateAudio" name="generateAudio" checked>
+                <label for="generateAudio">Generate audio file (takes longer but creates full MP3)</label>
+            </div>
+
+            <button type="submit" class="button" id="generateBtn">
+                Generate Meditation
+            </button>
+        </form>
+
+        <div class="examples">
+            <h3>Example scenarios (click to use):</h3>
+            <ul class="example-list" id="exampleList">
+                <li>Manifesting $90,000 for financial freedom and abundance</li>
+                <li>Gaining admission to my dream university program</li>
+                <li>Achieving perfect health with clear skin and a strong body</li>
+                <li>Developing consistent healthy eating habits</li>
+                <li>Finding my ideal romantic partner and lasting love</li>
+                <li>Launching a successful business venture</li>
+                <li>Healing from past trauma and finding inner peace</li>
+                <li>Enhancing creativity and artistic expression</li>
+            </ul>
+        </div>
+
+        <div class="progress-section" id="progressSection">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="log-container" id="logContainer"></div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <div class="result-card">
+                <h2 class="result-title">Your Meditation is Ready!</h2>
+                <div class="download-buttons" id="downloadButtons"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('meditationForm');
+        const generateBtn = document.getElementById('generateBtn');
+        const progressSection = document.getElementById('progressSection');
+        const resultsSection = document.getElementById('resultsSection');
+        const progressFill = document.getElementById('progressFill');
+        const logContainer = document.getElementById('logContainer');
+        const downloadButtons = document.getElementById('downloadButtons');
+        const scenarioInput = document.getElementById('scenario');
+        const exampleList = document.getElementById('exampleList');
+
+        // Handle example clicks
+        exampleList.addEventListener('click', (e) => {
+            if (e.target.tagName === 'LI') {
+                scenarioInput.value = e.target.textContent;
+                scenarioInput.focus();
+            }
+        });
+
+        function addLogEntry(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            
+            const time = new Date().toLocaleTimeString();
+            const messageClass = type === 'error' ? 'log-error' : 
+                               type === 'success' ? 'log-success' : 'log-message';
+            
+            entry.innerHTML = `
+                <span class="log-time">[${time}]</span>
+                <span class="${messageClass}">${message}</span>
+            `;
+            
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function updateProgress(percentage) {
+            progressFill.style.width = `${percentage}%`;
+        }
+
+        async function pollProgress(sessionId) {
+            try {
+                const response = await fetch(`/progress/${sessionId}`);
+                const data = await response.json();
+                
+                if (data.updates) {
+                    data.updates.forEach(update => {
+                        addLogEntry(update.message);
+                        if (update.percentage) {
+                            updateProgress(update.percentage);
+                        }
+                        
+                        if (update.complete && update.result) {
+                            handleComplete(update.result);
+                        }
+                    });
+                    
+                    // Continue polling if not complete
+                    if (!data.updates.some(u => u.complete)) {
+                        setTimeout(() => pollProgress(sessionId), 1000);
+                    }
+                }
+            } catch (error) {
+                addLogEntry(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        function handleComplete(result) {
+            if (result.status === 'success') {
+                addLogEntry('Generation complete!', 'success');
+                
+                // Show download buttons
+                downloadButtons.innerHTML = '';
+                
+                // Transcript download
+                if (result.transcript_file) {
+                    const transcriptBtn = document.createElement('a');
+                    transcriptBtn.href = `/download/transcript/${result.transcript_file}`;
+                    transcriptBtn.className = 'download-btn secondary';
+                    transcriptBtn.innerHTML = '📄 Download Transcript';
+                    downloadButtons.appendChild(transcriptBtn);
+                }
+                
+                // Audio download
+                if (result.audio_file) {
+                    const audioBtn = document.createElement('a');
+                    audioBtn.href = `/download/audio/${result.audio_file}`;
+                    audioBtn.className = 'download-btn';
+                    audioBtn.innerHTML = '🎵 Download Audio MP3';
+                    downloadButtons.appendChild(audioBtn);
+                    
+                    if (result.audio_duration) {
+                        addLogEntry(`Audio duration: ${result.audio_duration.toFixed(1)} minutes`, 'success');
+                    }
+                }
+                
+                resultsSection.style.display = 'block';
+            } else {
+                addLogEntry(`Error: ${result.error || 'Unknown error'}`, 'error');
+            }
+            
+            generateBtn.disabled = false;
+            generateBtn.textContent = 'Generate Another Meditation';
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Reset UI
+            progressSection.style.display = 'block';
+            resultsSection.style.display = 'none';
+            logContainer.innerHTML = '';
+            updateProgress(0);
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generating...';
+            
+            const formData = {
+                scenario: document.getElementById('scenario').value,
+                duration: parseInt(document.getElementById('duration').value),
+                generate_audio: document.getElementById('generateAudio').checked
+            };
+            
+            addLogEntry('Starting meditation generation...');
+            
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.session_id) {
+                    addLogEntry('Session created, processing request...');
+                    pollProgress(data.session_id);
+                } else if (data.error) {
+                    addLogEntry(data.error, 'error');
+                    generateBtn.disabled = false;
+                    generateBtn.textContent = 'Generate Meditation';
+                }
+            } catch (error) {
+                addLogEntry(`Network error: ${error.message}`, 'error');
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Generate Meditation';
+            }
+        });
+    </script>
+</body>
+</html>
