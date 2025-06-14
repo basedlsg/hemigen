@@ -121,26 +121,23 @@
             75% { transform: translateY(-25px) rotate(3deg); }
         }
 
-        /* Main Layout - Full Screen Grid */
+        /* Main Layout - Centered Vertical */
         .app-container {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            grid-template-rows: auto 1fr;
-            height: 100vh;
-            gap: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--space-md);
         }
 
-        /* Header spanning full width */
+        /* Header */
         .header {
-            grid-column: 1 / -1;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: var(--space-md) var(--space-xl);
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
+            justify-content: center;
+            padding: var(--space-lg) 0;
+            margin-bottom: var(--space-xl);
         }
 
         .app-branding {
@@ -150,8 +147,8 @@
         }
 
         .breathing-circle {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             position: relative;
         }
 
@@ -192,88 +189,43 @@
 
         .app-title {
             font-family: var(--font-secondary);
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 300;
             color: var(--sage-green);
             letter-spacing: -0.02em;
         }
 
         .app-subtitle {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: var(--earth-tone);
             font-weight: 300;
+            text-align: center;
+            margin-top: var(--space-xs);
         }
 
-        .header-status {
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-            font-family: var(--font-secondary);
-            color: var(--earth-tone);
-            font-size: 0.9rem;
-        }
-
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            background: var(--sage-green);
-            border-radius: 50%;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* Main Content Area */
-        .content-area {
-            display: flex;
-            flex-direction: column;
-            padding: var(--space-xl);
-            background: rgba(255, 255, 255, 0.05);
-            overflow-y: auto;
-        }
-
-        .welcome-section {
-            margin-bottom: var(--space-xl);
-        }
-
-        .welcome-title {
-            font-family: var(--font-secondary);
-            font-size: 2rem;
-            font-weight: 400;
-            color: var(--sage-green);
-            margin-bottom: var(--space-sm);
-        }
-
-        .welcome-text {
-            font-size: 1.1rem;
-            color: var(--earth-tone);
-            line-height: 1.7;
-            max-width: 600px;
-        }
-
-        /* Example Cards Grid */
+        /* Example Cards - Top Section */
         .examples-section {
-            flex: 1;
+            margin-bottom: var(--space-xl);
         }
 
         .examples-title {
             font-family: var(--font-secondary);
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 500;
             color: var(--sage-green);
             margin-bottom: var(--space-md);
+            text-align: center;
         }
 
         .examples-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: var(--space-md);
-            max-height: calc(100vh - 400px);
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-sm);
+            max-height: 160px;
             overflow-y: auto;
-            padding-right: var(--space-sm);
+            padding: var(--space-sm);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
         }
 
         .example-card {
@@ -282,12 +234,11 @@
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid var(--glass-border);
             border-radius: var(--border-radius);
-            padding: var(--space-md);
+            padding: var(--space-sm);
             cursor: pointer;
             transition: var(--transition-calm);
             position: relative;
             overflow: hidden;
-            height: fit-content;
         }
 
         .example-card::before {
@@ -295,7 +246,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 4px;
+            width: 3px;
             height: 100%;
             background: linear-gradient(135deg, var(--sage-green), var(--primary-blue));
             transform: scaleY(0);
@@ -303,9 +254,9 @@
         }
 
         .example-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-2px);
             background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 12px 32px rgba(107, 191, 154, 0.2);
+            box-shadow: 0 8px 20px rgba(107, 191, 154, 0.2);
         }
 
         .example-card:hover::before {
@@ -315,50 +266,46 @@
         .example-text {
             font-family: var(--font-secondary);
             color: var(--earth-tone);
-            line-height: 1.6;
-            font-size: 0.95rem;
+            line-height: 1.4;
+            font-size: 0.85rem;
         }
 
-        /* Sidebar Form */
-        .sidebar {
+        /* Main Input Area - Center */
+        .main-input-section {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-left: 1px solid var(--glass-border);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
             padding: var(--space-xl);
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-xl);
-            overflow-y: auto;
-        }
-
-        .form-section {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-sm);
+            margin-bottom: var(--space-xl);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
 
         .form-label {
             font-family: var(--font-secondary);
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 500;
             color: var(--sage-green);
+            margin-bottom: var(--space-sm);
+            text-align: center;
         }
 
         .form-textarea {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             border: 2px solid transparent;
             border-radius: var(--border-radius);
-            padding: var(--space-sm) var(--space-md);
+            padding: var(--space-md);
             font-family: var(--font-primary);
-            font-size: 14px;
+            font-size: 16px;
             color: #1e293b;
             transition: var(--transition-calm);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            min-height: 120px;
+            min-height: 140px;
             resize: vertical;
             line-height: 1.6;
+            width: 100%;
         }
 
         .form-textarea:focus {
@@ -371,13 +318,39 @@
         .form-textarea::placeholder {
             color: var(--earth-tone);
             opacity: 0.7;
+            text-align: center;
+        }
+
+        /* Bottom Controls Section */
+        .bottom-controls {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+            align-items: center;
+        }
+
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3xl);
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         /* Duration Control */
         .duration-container {
             display: flex;
             flex-direction: column;
+            align-items: center;
             gap: var(--space-sm);
+            min-width: 200px;
+        }
+
+        .duration-label {
+            font-family: var(--font-secondary);
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--sage-green);
         }
 
         .duration-slider {
@@ -388,6 +361,7 @@
             border-radius: 4px;
             outline: none;
             transition: var(--transition-calm);
+            width: 200px;
         }
 
         .duration-slider::-webkit-slider-thumb {
@@ -410,7 +384,7 @@
         .duration-display {
             text-align: center;
             font-family: var(--font-secondary);
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 500;
             color: var(--sage-green);
         }
@@ -465,6 +439,7 @@
             user-select: none;
             font-size: 0.9rem;
             line-height: 1.4;
+            max-width: 240px;
         }
 
         /* Generate Button */
@@ -473,16 +448,15 @@
             color: white;
             border: none;
             border-radius: var(--border-radius);
-            padding: var(--space-md) var(--space-xl);
+            padding: var(--space-md) var(--space-3xl);
             font-family: var(--font-secondary);
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: 500;
             cursor: pointer;
             transition: var(--transition-calm);
             position: relative;
             overflow: hidden;
             min-height: var(--touch-target);
-            margin-top: var(--space-md);
         }
 
         .generate-button::before {
@@ -675,52 +649,56 @@
         }
 
         /* Responsive Design */
-        @media (max-width: 1200px) {
+        @media (max-width: 768px) {
             .app-container {
-                grid-template-columns: 1fr 350px;
-            }
-        }
-
-        @media (max-width: 968px) {
-            .app-container {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto auto 1fr;
-            }
-
-            .sidebar {
-                border-left: none;
-                border-top: 1px solid var(--glass-border);
-                padding: var(--space-md);
-            }
-
-            .content-area {
-                padding: var(--space-md);
-            }
-
-            .examples-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                max-height: 300px;
+                padding: var(--space-sm);
             }
 
             .app-title {
-                font-size: 2rem;
+                font-size: 1.8rem;
             }
 
-            .header {
-                flex-direction: column;
-                gap: var(--space-sm);
-                padding: var(--space-md);
-            }
-        }
-
-        @media (max-width: 768px) {
             .examples-grid {
                 grid-template-columns: 1fr;
+                max-height: 120px;
+            }
+
+            .controls-row {
+                flex-direction: column;
+                gap: var(--space-lg);
+            }
+
+            .duration-container {
+                min-width: 280px;
+            }
+
+            .checkbox-label {
+                max-width: 280px;
             }
 
             .overlay-content {
                 padding: var(--space-xl);
                 margin: var(--space-md);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-input-section {
+                padding: var(--space-md);
+            }
+
+            .generate-button {
+                width: 100%;
+                padding: var(--space-md);
+            }
+
+            .breathing-circle {
+                width: 40px;
+                height: 40px;
+            }
+
+            .app-title {
+                font-size: 1.6rem;
             }
         }
 
@@ -777,87 +755,70 @@
                     <p class="app-subtitle">AI-Powered Hemi-Sync Meditation Generator</p>
                 </div>
             </div>
-            <div class="header-status">
-                <div class="status-indicator"></div>
-                <span>AI & Neural Voice Synthesis Ready</span>
-            </div>
         </header>
 
-        <!-- Main Content Area -->
-        <main class="content-area">
-            <section class="welcome-section">
-                <h2 class="welcome-title">Transform Your Intentions Into Immersive Meditations</h2>
-                <p class="welcome-text">
-                    Hemi-gen uses advanced AI and neuroscience research to create personalized meditation experiences. 
-                    Simply describe your intention, and we'll generate a complete Hemi-Sync style meditation with 
-                    professional voice synthesis and binaural beat backgrounds.
-                </p>
-            </section>
-
-            <section class="examples-section">
-                <h3 class="examples-title">Popular Meditation Intentions</h3>
-                <div class="examples-grid" id="examplesList">
-                    <div class="example-card" tabindex="0" role="button">
-                        <p class="example-text">Manifesting $90,000 for financial freedom and abundance</p>
-                    </div>
-                    <div class="example-card" tabindex="0" role="button">
-                        <p class="example-text">Attracting my ideal romantic partner and soulmate connection</p>
-                    </div>
-                    <div class="example-card" tabindex="0" role="button">
-                        <p class="example-text">Healing anxiety and developing unshakeable inner peace</p>
-                    </div>
-                    <div class="example-card" tabindex="0" role="button">
-                        <p class="example-text">Achieving perfect health with radiant skin and vitality</p>
-                    </div>
-                    <div class="example-card" tabindex="0" role="button">
-                        <p class="example-text">Launching a successful and fulfilling business venture</p>
-                    </div>
-                    <div class="example-card" tabindex="0" role="button">
-                        <p class="example-text">Enhancing creativity and unlocking artistic expression</p>
-                    </div>
-                    <div class="example-card" tabindex="0" role="button">
-                        <p class="example-text">Developing psychic abilities and intuitive awareness</p>
-                    </div>
-                    <div class="example-card" tabindex="0" role="button">
-                        <p class="example-text">Releasing past trauma and embracing emotional freedom</p>
-                    </div>
+        <!-- Examples Section - Top -->
+        <section class="examples-section">
+            <h3 class="examples-title">Popular Meditation Intentions</h3>
+            <div class="examples-grid" id="examplesList">
+                <div class="example-card" tabindex="0" role="button">
+                    <p class="example-text">Manifesting $90,000 for financial freedom and abundance</p>
                 </div>
-            </section>
+                <div class="example-card" tabindex="0" role="button">
+                    <p class="example-text">Attracting my ideal romantic partner and soulmate connection</p>
+                </div>
+                <div class="example-card" tabindex="0" role="button">
+                    <p class="example-text">Healing anxiety and developing unshakeable inner peace</p>
+                </div>
+                <div class="example-card" tabindex="0" role="button">
+                    <p class="example-text">Achieving perfect health with radiant skin and vitality</p>
+                </div>
+                <div class="example-card" tabindex="0" role="button">
+                    <p class="example-text">Launching a successful and fulfilling business venture</p>
+                </div>
+                <div class="example-card" tabindex="0" role="button">
+                    <p class="example-text">Enhancing creativity and unlocking artistic expression</p>
+                </div>
+                <div class="example-card" tabindex="0" role="button">
+                    <p class="example-text">Developing psychic abilities and intuitive awareness</p>
+                </div>
+                <div class="example-card" tabindex="0" role="button">
+                    <p class="example-text">Releasing past trauma and embracing emotional freedom</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Input Section - Center -->
+        <main class="main-input-section">
+            <form id="meditationForm">
+                <label for="scenario" class="form-label">Describe Your Meditation Intention</label>
+                <textarea 
+                    id="scenario" 
+                    name="scenario" 
+                    class="form-textarea"
+                    placeholder="What would you like to manifest, heal, or explore? Be as specific as possible about your desired outcome..."
+                    required
+                    aria-describedby="scenario-help"
+                ></textarea>
+            </form>
         </main>
 
-        <!-- Sidebar Form -->
-        <aside class="sidebar">
-            <form id="meditationForm">
-                <div class="form-section">
-                    <label for="scenario" class="form-label">Describe Your Meditation Intention</label>
-                    <textarea 
-                        id="scenario" 
-                        name="scenario" 
-                        class="form-textarea"
-                        placeholder="What would you like to manifest, heal, or explore? Be as specific as possible about your desired outcome..."
-                        required
-                        aria-describedby="scenario-help"
-                    ></textarea>
-                    <small id="scenario-help" style="color: var(--earth-tone); font-size: 0.85rem;">
-                        The more specific you are, the more personalized your meditation will be.
-                    </small>
-                </div>
-
-                <div class="form-section">
-                    <label for="duration" class="form-label">Duration</label>
-                    <div class="duration-container">
-                        <input 
-                            type="range" 
-                            id="duration" 
-                            name="duration" 
-                            min="10" 
-                            max="60" 
-                            value="25" 
-                            class="duration-slider"
-                            aria-describedby="duration-display"
-                        >
-                        <div id="duration-display" class="duration-display">25 minutes</div>
-                    </div>
+        <!-- Bottom Controls -->
+        <section class="bottom-controls">
+            <div class="controls-row">
+                <div class="duration-container">
+                    <div class="duration-label">Duration</div>
+                    <input 
+                        type="range" 
+                        id="duration" 
+                        name="duration" 
+                        min="10" 
+                        max="60" 
+                        value="25" 
+                        class="duration-slider"
+                        aria-describedby="duration-display"
+                    >
+                    <div id="duration-display" class="duration-display">25 minutes</div>
                 </div>
 
                 <div class="checkbox-container">
@@ -869,12 +830,12 @@
                         Generate full audio meditation with neural voice synthesis
                     </label>
                 </div>
+            </div>
 
-                <button type="submit" class="generate-button" id="generateBtn">
-                    Create Meditation
-                </button>
-            </form>
-        </aside>
+            <button type="submit" class="generate-button" id="generateBtn" form="meditationForm">
+                Create Meditation
+            </button>
+        </section>
     </div>
 
     <!-- Progress Overlay -->
