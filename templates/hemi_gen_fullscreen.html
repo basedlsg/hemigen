@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hemi-gen - AI Meditation Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables following 2024-2025 Design Guidelines */
+        :root {
+            /* Color Psychology - Calm Palette */
+            --primary-blue: #87CEEB;
+            --primary-blue-dark: #5FA8C4;
+            --sage-green: #6BBF9A;
+            --sage-green-light: #E3F6E5;
+            --earth-tone: #9CA39C;
+            --mocha-mousse: #B8A082;
+            
+            /* Glassmorphism Colors */
+            --glass-bg: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: rgba(0, 0, 0, 0.1);
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-secondary: 'Nunito', sans-serif;
+            
+            /* Spacing - 8pt Grid System */
+            --space-xs: 8px;
+            --space-sm: 16px;
+            --space-md: 24px;
+            --space-lg: 32px;
+            --space-xl: 40px;
+            --space-2xl: 48px;
+            --space-3xl: 60px;
+            
+            /* Component sizes */
+            --touch-target: 48px;
+            --border-radius: 16px;
+            --border-radius-lg: 24px;
+            
+            /* Transitions */
+            --transition-calm: all 200ms ease-in-out;
+            --transition-breathe: all 4000ms ease-in-out;
+        }
+
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            font-size: 16px;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            height: 100vh;
+            overflow: hidden;
+            color: #1e293b;
+        }
+
+        /* Nature-inspired animated background */
+        .background-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--sage-green-light), var(--primary-blue));
+            opacity: 0.08;
+            animation: float 25s ease-in-out infinite;
+        }
+
+        .floating-shape:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            top: 5%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .floating-shape:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 70%;
+            right: 10%;
+            animation-delay: -8s;
+        }
+
+        .floating-shape:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            bottom: 10%;
+            left: 40%;
+            animation-delay: -16s;
+        }
+
+        .floating-shape:nth-child(4) {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            right: 30%;
+            animation-delay: -24s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-30px) rotate(5deg); }
+            50% { transform: translateY(-15px) rotate(-3deg); }
+            75% { transform: translateY(-25px) rotate(3deg); }
+        }
+
+        /* Main Layout - Full Screen Grid */
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            grid-template-rows: auto 1fr;
+            height: 100vh;
+            gap: 0;
+        }
+
+        /* Header spanning full width */
+        .header {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-md) var(--space-xl);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .app-branding {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .breathing-circle {
+            width: 60px;
+            height: 60px;
+            position: relative;
+        }
+
+        .circle-outer {
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--sage-green);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: breathe 8s ease-in-out infinite;
+        }
+
+        .circle-inner {
+            width: 60%;
+            height: 60%;
+            background: linear-gradient(135deg, var(--sage-green), var(--primary-blue));
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: breathe-inner 8s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            25% { transform: scale(1.1); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+            75% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        @keyframes breathe-inner {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            25% { transform: translate(-50%, -50%) scale(0.9); }
+            50% { transform: translate(-50%, -50%) scale(0.8); }
+            75% { transform: translate(-50%, -50%) scale(0.9); }
+        }
+
+        .app-title {
+            font-family: var(--font-secondary);
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: var(--sage-green);
+            letter-spacing: -0.02em;
+        }
+
+        .app-subtitle {
+            font-size: 1rem;
+            color: var(--earth-tone);
+            font-weight: 300;
+        }
+
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-family: var(--font-secondary);
+            color: var(--earth-tone);
+            font-size: 0.9rem;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background: var(--sage-green);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Content Area */
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            padding: var(--space-xl);
+            background: rgba(255, 255, 255, 0.05);
+            overflow-y: auto;
+        }
+
+        .welcome-section {
+            margin-bottom: var(--space-xl);
+        }
+
+        .welcome-title {
+            font-family: var(--font-secondary);
+            font-size: 2rem;
+            font-weight: 400;
+            color: var(--sage-green);
+            margin-bottom: var(--space-sm);
+        }
+
+        .welcome-text {
+            font-size: 1.1rem;
+            color: var(--earth-tone);
+            line-height: 1.7;
+            max-width: 600px;
+        }
+
+        /* Example Cards Grid */
+        .examples-section {
+            flex: 1;
+        }
+
+        .examples-title {
+            font-family: var(--font-secondary);
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: var(--sage-green);
+            margin-bottom: var(--space-md);
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: var(--space-md);
+            max-height: calc(100vh - 400px);
+            overflow-y: auto;
+            padding-right: var(--space-sm);
+        }
+
+        .example-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: var(--space-md);
+            cursor: pointer;
+            transition: var(--transition-calm);
+            position: relative;
+            overflow: hidden;
+            height: fit-content;
+        }
+
+        .example-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, var(--sage-green), var(--primary-blue));
+            transform: scaleY(0);
+            transition: var(--transition-calm);
+        }
+
+        .example-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 12px 32px rgba(107, 191, 154, 0.2);
+        }
+
+        .example-card:hover::before {
+            transform: scaleY(1);
+        }
+
+        .example-text {
+            font-family: var(--font-secondary);
+            color: var(--earth-tone);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* Sidebar Form */
+        .sidebar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-left: 1px solid var(--glass-border);
+            padding: var(--space-xl);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xl);
+            overflow-y: auto;
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .form-label {
+            font-family: var(--font-secondary);
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--sage-green);
+        }
+
+        .form-textarea {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid transparent;
+            border-radius: var(--border-radius);
+            padding: var(--space-sm) var(--space-md);
+            font-family: var(--font-primary);
+            font-size: 14px;
+            color: #1e293b;
+            transition: var(--transition-calm);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            min-height: 120px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--sage-green);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 0 4px rgba(107, 191, 154, 0.1);
+        }
+
+        .form-textarea::placeholder {
+            color: var(--earth-tone);
+            opacity: 0.7;
+        }
+
+        /* Duration Control */
+        .duration-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .duration-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 8px;
+            background: linear-gradient(90deg, var(--sage-green-light), var(--sage-green));
+            border-radius: 4px;
+            outline: none;
+            transition: var(--transition-calm);
+        }
+
+        .duration-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--sage-green);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(107, 191, 154, 0.3);
+            transition: var(--transition-calm);
+        }
+
+        .duration-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(107, 191, 154, 0.4);
+        }
+
+        .duration-display {
+            text-align: center;
+            font-family: var(--font-secondary);
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--sage-green);
+        }
+
+        /* Checkbox */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .custom-checkbox {
+            position: relative;
+            width: 20px;
+            height: 20px;
+        }
+
+        .custom-checkbox input {
+            opacity: 0;
+            position: absolute;
+        }
+
+        .checkbox-visual {
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid var(--sage-green);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-calm);
+            cursor: pointer;
+        }
+
+        .custom-checkbox input:checked + .checkbox-visual {
+            background: var(--sage-green);
+            transform: scale(1.05);
+        }
+
+        .custom-checkbox input:checked + .checkbox-visual::after {
+            content: "✓";
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .checkbox-label {
+            font-family: var(--font-secondary);
+            color: var(--earth-tone);
+            cursor: pointer;
+            user-select: none;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* Generate Button */
+        .generate-button {
+            background: linear-gradient(135deg, var(--sage-green), var(--primary-blue));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: var(--space-md) var(--space-xl);
+            font-family: var(--font-secondary);
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-calm);
+            position: relative;
+            overflow: hidden;
+            min-height: var(--touch-target);
+            margin-top: var(--space-md);
+        }
+
+        .generate-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: var(--transition-calm);
+        }
+
+        .generate-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(107, 191, 154, 0.3);
+        }
+
+        .generate-button:hover::before {
+            left: 100%;
+        }
+
+        .generate-button:disabled {
+            background: var(--earth-tone);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Progress and Results Overlays */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .overlay-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-3xl);
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .overlay-title {
+            font-family: var(--font-secondary);
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--sage-green);
+            margin-bottom: var(--space-md);
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(107, 191, 154, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: var(--space-xl);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--sage-green), var(--primary-blue));
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-bottom: var(--space-md);
+            font-family: var(--font-secondary);
+            color: var(--sage-green);
+            font-weight: 500;
+        }
+
+        .log-container {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: var(--space-md);
+            height: 250px;
+            overflow-y: auto;
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            margin-bottom: var(--space-xs);
+            opacity: 0;
+            animation: fadeInLog 0.3s ease forwards;
+        }
+
+        @keyframes fadeInLog {
+            to { opacity: 1; }
+        }
+
+        .log-time {
+            color: var(--primary-blue);
+            margin-right: var(--space-xs);
+        }
+
+        .log-message {
+            color: #e2e8f0;
+        }
+
+        .log-success {
+            color: var(--sage-green);
+        }
+
+        .log-error {
+            color: #ef4444;
+        }
+
+        /* Download Buttons */
+        .download-buttons {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: var(--space-md);
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, var(--sage-green), var(--primary-blue));
+            color: white;
+            text-decoration: none;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--border-radius);
+            font-family: var(--font-secondary);
+            font-weight: 500;
+            transition: var(--transition-calm);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            min-height: var(--touch-target);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(107, 191, 154, 0.3);
+        }
+
+        .download-btn.secondary {
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--sage-green);
+            border: 1px solid var(--sage-green);
+        }
+
+        .download-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        /* Close Button */
+        .close-btn {
+            position: absolute;
+            top: var(--space-md);
+            right: var(--space-md);
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--earth-tone);
+            cursor: pointer;
+            padding: var(--space-xs);
+            border-radius: 50%;
+            transition: var(--transition-calm);
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--sage-green);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .app-container {
+                grid-template-columns: 1fr 350px;
+            }
+        }
+
+        @media (max-width: 968px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr;
+            }
+
+            .sidebar {
+                border-left: none;
+                border-top: 1px solid var(--glass-border);
+                padding: var(--space-md);
+            }
+
+            .content-area {
+                padding: var(--space-md);
+            }
+
+            .examples-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                max-height: 300px;
+            }
+
+            .app-title {
+                font-size: 2rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: var(--space-sm);
+                padding: var(--space-md);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .examples-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .overlay-content {
+                padding: var(--space-xl);
+                margin: var(--space-md);
+            }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            .floating-shape,
+            .circle-outer,
+            .circle-inner,
+            .generate-button::before,
+            .status-indicator {
+                animation: none;
+            }
+            
+            * {
+                transition: none !important;
+            }
+        }
+
+        .form-textarea:focus-visible,
+        .generate-button:focus-visible,
+        .example-card:focus-visible,
+        .download-btn:focus-visible {
+            outline: 3px solid var(--sage-green);
+            outline-offset: 2px;
+        }
+
+        @media (prefers-contrast: high) {
+            :root {
+                --glass-bg: rgba(255, 255, 255, 0.95);
+                --glass-border: rgba(0, 0, 0, 0.5);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background Elements -->
+    <div class="background-elements">
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="app-branding">
+                <div class="breathing-circle" role="img" aria-label="Breathing meditation circle">
+                    <div class="circle-outer"></div>
+                    <div class="circle-inner"></div>
+                </div>
+                <div>
+                    <h1 class="app-title">Hemi-gen</h1>
+                    <p class="app-subtitle">AI-Powered Hemi-Sync Meditation Generator</p>
+                </div>
+            </div>
+            <div class="header-status">
+                <div class="status-indicator"></div>
+                <span>AI & Neural Voice Synthesis Ready</span>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+            <section class="welcome-section">
+                <h2 class="welcome-title">Transform Your Intentions Into Immersive Meditations</h2>
+                <p class="welcome-text">
+                    Hemi-gen uses advanced AI and neuroscience research to create personalized meditation experiences. 
+                    Simply describe your intention, and we'll generate a complete Hemi-Sync style meditation with 
+                    professional voice synthesis and binaural beat backgrounds.
+                </p>
+            </section>
+
+            <section class="examples-section">
+                <h3 class="examples-title">Popular Meditation Intentions</h3>
+                <div class="examples-grid" id="examplesList">
+                    <div class="example-card" tabindex="0" role="button">
+                        <p class="example-text">Manifesting $90,000 for financial freedom and abundance</p>
+                    </div>
+                    <div class="example-card" tabindex="0" role="button">
+                        <p class="example-text">Attracting my ideal romantic partner and soulmate connection</p>
+                    </div>
+                    <div class="example-card" tabindex="0" role="button">
+                        <p class="example-text">Healing anxiety and developing unshakeable inner peace</p>
+                    </div>
+                    <div class="example-card" tabindex="0" role="button">
+                        <p class="example-text">Achieving perfect health with radiant skin and vitality</p>
+                    </div>
+                    <div class="example-card" tabindex="0" role="button">
+                        <p class="example-text">Launching a successful and fulfilling business venture</p>
+                    </div>
+                    <div class="example-card" tabindex="0" role="button">
+                        <p class="example-text">Enhancing creativity and unlocking artistic expression</p>
+                    </div>
+                    <div class="example-card" tabindex="0" role="button">
+                        <p class="example-text">Developing psychic abilities and intuitive awareness</p>
+                    </div>
+                    <div class="example-card" tabindex="0" role="button">
+                        <p class="example-text">Releasing past trauma and embracing emotional freedom</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Sidebar Form -->
+        <aside class="sidebar">
+            <form id="meditationForm">
+                <div class="form-section">
+                    <label for="scenario" class="form-label">Describe Your Meditation Intention</label>
+                    <textarea 
+                        id="scenario" 
+                        name="scenario" 
+                        class="form-textarea"
+                        placeholder="What would you like to manifest, heal, or explore? Be as specific as possible about your desired outcome..."
+                        required
+                        aria-describedby="scenario-help"
+                    ></textarea>
+                    <small id="scenario-help" style="color: var(--earth-tone); font-size: 0.85rem;">
+                        The more specific you are, the more personalized your meditation will be.
+                    </small>
+                </div>
+
+                <div class="form-section">
+                    <label for="duration" class="form-label">Duration</label>
+                    <div class="duration-container">
+                        <input 
+                            type="range" 
+                            id="duration" 
+                            name="duration" 
+                            min="10" 
+                            max="60" 
+                            value="25" 
+                            class="duration-slider"
+                            aria-describedby="duration-display"
+                        >
+                        <div id="duration-display" class="duration-display">25 minutes</div>
+                    </div>
+                </div>
+
+                <div class="checkbox-container">
+                    <div class="custom-checkbox">
+                        <input type="checkbox" id="generateAudio" name="generateAudio" checked>
+                        <div class="checkbox-visual"></div>
+                    </div>
+                    <label for="generateAudio" class="checkbox-label">
+                        Generate full audio meditation with neural voice synthesis
+                    </label>
+                </div>
+
+                <button type="submit" class="generate-button" id="generateBtn">
+                    Create Meditation
+                </button>
+            </form>
+        </aside>
+    </div>
+
+    <!-- Progress Overlay -->
+    <div class="overlay" id="progressOverlay">
+        <div class="overlay-content">
+            <button class="close-btn" id="closeProgress" aria-label="Close progress">×</button>
+            <h2 class="overlay-title">Creating Your Meditation</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Initializing...</div>
+            <div class="log-container" id="logContainer"></div>
+        </div>
+    </div>
+
+    <!-- Results Overlay -->
+    <div class="overlay" id="resultsOverlay">
+        <div class="overlay-content">
+            <button class="close-btn" id="closeResults" aria-label="Close results">×</button>
+            <h2 class="overlay-title">Your Meditation is Ready! 🧘‍♀️</h2>
+            <div class="download-buttons" id="downloadButtons"></div>
+        </div>
+    </div>
+
+    <script>
+        class HemiGenApp {
+            constructor() {
+                this.form = document.getElementById('meditationForm');
+                this.generateBtn = document.getElementById('generateBtn');
+                this.progressOverlay = document.getElementById('progressOverlay');
+                this.resultsOverlay = document.getElementById('resultsOverlay');
+                this.progressFill = document.getElementById('progressFill');
+                this.progressText = document.getElementById('progressText');
+                this.logContainer = document.getElementById('logContainer');
+                this.downloadButtons = document.getElementById('downloadButtons');
+                this.scenarioInput = document.getElementById('scenario');
+                this.durationSlider = document.getElementById('duration');
+                this.durationDisplay = document.getElementById('duration-display');
+                
+                this.initializeEventListeners();
+                this.initializeDurationSlider();
+                this.initializeExampleCards();
+            }
+
+            initializeEventListeners() {
+                this.form.addEventListener('submit', this.handleSubmit.bind(this));
+                
+                // Close overlay handlers
+                document.getElementById('closeProgress').addEventListener('click', () => {
+                    this.progressOverlay.style.display = 'none';
+                });
+                
+                document.getElementById('closeResults').addEventListener('click', () => {
+                    this.resultsOverlay.style.display = 'none';
+                });
+                
+                // ESC key to close overlays
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        this.progressOverlay.style.display = 'none';
+                        this.resultsOverlay.style.display = 'none';
+                    }
+                });
+            }
+
+            initializeDurationSlider() {
+                this.durationSlider.addEventListener('input', (e) => {
+                    this.durationDisplay.textContent = `${e.target.value} minutes`;
+                });
+            }
+
+            initializeExampleCards() {
+                const exampleCards = document.querySelectorAll('.example-card');
+                exampleCards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        const text = card.querySelector('.example-text').textContent;
+                        this.scenarioInput.value = text;
+                        this.scenarioInput.focus();
+                    });
+
+                    // Keyboard accessibility
+                    card.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            card.click();
+                        }
+                    });
+                });
+            }
+
+            async handleSubmit(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    scenario: this.scenarioInput.value.trim(),
+                    duration: parseInt(this.durationSlider.value),
+                    generate_audio: document.getElementById('generateAudio').checked
+                };
+
+                // Validate input
+                if (!formData.scenario) {
+                    this.showError('Please describe your meditation intention');
+                    return;
+                }
+
+                if (formData.scenario.length < 10) {
+                    this.showError('Please provide a more detailed description (at least 10 characters)');
+                    return;
+                }
+
+                this.showProgress();
+                this.addLogEntry('Initializing Hemi-gen meditation creation...');
+                this.updateProgress(5, 'Connecting to AI consciousness...');
+
+                try {
+                    const response = await fetch('/generate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const data = await response.json();
+
+                    if (data.session_id) {
+                        this.addLogEntry('Session created, beginning generation process...');
+                        this.pollProgress(data.session_id);
+                    } else if (data.error) {
+                        this.showError(data.error);
+                    }
+                } catch (error) {
+                    this.showError(`Connection error: ${error.message}`);
+                }
+            }
+
+            async pollProgress(sessionId) {
+                try {
+                    const response = await fetch(`/progress/${sessionId}`);
+                    const data = await response.json();
+
+                    if (data.updates) {
+                        data.updates.forEach(update => {
+                            this.addLogEntry(update.message, update.message.includes('Error') ? 'error' : 'info');
+                            
+                            if (update.percentage) {
+                                this.updateProgress(update.percentage, update.message);
+                            }
+
+                            if (update.complete && update.result) {
+                                this.handleComplete(update.result);
+                                return;
+                            }
+                        });
+
+                        // Continue polling if not complete
+                        if (!data.updates.some(u => u.complete)) {
+                            setTimeout(() => this.pollProgress(sessionId), 1000);
+                        }
+                    }
+                } catch (error) {
+                    this.addLogEntry(`Polling error: ${error.message}`, 'error');
+                }
+            }
+
+            handleComplete(result) {
+                if (result.status === 'success') {
+                    this.updateProgress(100, 'Meditation created successfully!');
+                    this.addLogEntry('Your personalized Hemi-Sync meditation is ready!', 'success');
+                    setTimeout(() => this.showResults(result), 1000);
+                } else {
+                    this.showError(result.error || 'Unknown error occurred');
+                }
+
+                this.resetButton();
+            }
+
+            showResults(result) {
+                this.progressOverlay.style.display = 'none';
+                this.downloadButtons.innerHTML = '';
+
+                // Transcript download
+                if (result.transcript_file) {
+                    const transcriptBtn = this.createDownloadButton(
+                        '📄 Download Transcript', 
+                        `/download/transcript/${result.transcript_file}`,
+                        'secondary'
+                    );
+                    this.downloadButtons.appendChild(transcriptBtn);
+                }
+
+                // Audio download
+                if (result.audio_file) {
+                    const audioBtn = this.createDownloadButton(
+                        '🎵 Download Audio', 
+                        `/download/audio/${result.audio_file}`,
+                        'primary'
+                    );
+                    this.downloadButtons.appendChild(audioBtn);
+                }
+
+                this.resultsOverlay.style.display = 'flex';
+            }
+
+            createDownloadButton(text, href, type = 'primary') {
+                const btn = document.createElement('a');
+                btn.href = href;
+                btn.className = `download-btn ${type}`;
+                btn.textContent = text;
+                btn.setAttribute('download', '');
+                return btn;
+            }
+
+            showProgress() {
+                this.progressOverlay.style.display = 'flex';
+                this.generateBtn.disabled = true;
+                this.generateBtn.textContent = 'Creating...';
+                this.logContainer.innerHTML = '';
+                this.updateProgress(0);
+            }
+
+            resetButton() {
+                this.generateBtn.disabled = false;
+                this.generateBtn.textContent = 'Create Meditation';
+            }
+
+            updateProgress(percentage, message = '') {
+                this.progressFill.style.width = `${percentage}%`;
+                if (message) {
+                    this.progressText.textContent = message;
+                }
+            }
+
+            addLogEntry(message, type = 'info') {
+                const entry = document.createElement('div');
+                entry.className = `log-entry log-${type}`;
+                
+                const time = new Date().toLocaleTimeString();
+                entry.innerHTML = `
+                    <span class="log-time">[${time}]</span>
+                    <span class="log-message">${message}</span>
+                `;
+                
+                this.logContainer.appendChild(entry);
+                this.logContainer.scrollTop = this.logContainer.scrollHeight;
+            }
+
+            showError(message) {
+                this.addLogEntry(`Error: ${message}`, 'error');
+                this.resetButton();
+                this.progressOverlay.style.display = 'none';
+                alert(`Error: ${message}`);
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            new HemiGenApp();
+        });
+    </script>
+</body>
+</html>

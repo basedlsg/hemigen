@@ -326,8 +326,8 @@ def process_meditation_request(scenario, duration, generate_audio_flag, session_
 
 @app.route('/')
 def index():
-    """Serve the redesigned meditation generator interface."""
-    return render_template('meditation_generator_redesigned.html')
+    """Serve the full-screen Hemi-gen interface."""
+    return render_template('hemi_gen_fullscreen.html')
 
 @app.route('/generate', methods=['POST'])
 def generate():
@@ -418,7 +418,7 @@ def download(file_type, filename):
 @app.errorhandler(404)
 def not_found(error):
     """Custom 404 handler."""
-    return render_template('meditation_generator_redesigned.html'), 404
+    return render_template('hemi_gen_fullscreen.html'), 404
 
 @app.errorhandler(500)
 def internal_error(error):
@@ -427,11 +427,11 @@ def internal_error(error):
 
 if __name__ == '__main__':
     print("="*60)
-    print("🧘 Zenith Flow AI Meditation Generator")
-    print("🎨 2024-2025 Redesigned Interface")
+    print("🧘 Hemi-gen - AI Meditation Generator")
+    print("🎨 Full-Screen 2024-2025 Interface")
     print("="*60)
     print("🌐 Server: http://127.0.0.1:5001")
-    print("💫 Features: Glassmorphism, Breathing Animations, Accessibility")
+    print("💫 Features: Full-screen layout, Glassmorphism, Breathing Animations")
     print("🧠 AI: Enhanced Gemini Pro with latest neuroscience research")
     print("🎵 Audio: Neural voice synthesis + Hemi-Sync frequencies")
     print("💡 Press Ctrl+C to stop")
