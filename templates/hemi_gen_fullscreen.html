@@ -142,8 +142,10 @@
 
         .app-branding {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: var(--space-md);
+            gap: var(--space-sm);
+            text-align: center;
         }
 
         .breathing-circle {
@@ -190,15 +192,15 @@
         .app-title {
             font-family: var(--font-secondary);
             font-size: 2.2rem;
-            font-weight: 300;
-            color: var(--sage-green);
+            font-weight: 400;
+            color: #2c7a7b;
             letter-spacing: -0.02em;
         }
 
         .app-subtitle {
-            font-size: 0.9rem;
-            color: var(--earth-tone);
-            font-weight: 300;
+            font-size: 1rem;
+            color: #4a5568;
+            font-weight: 400;
             text-align: center;
             margin-top: var(--space-xs);
         }
@@ -210,11 +212,12 @@
 
         .examples-title {
             font-family: var(--font-secondary);
-            font-size: 1.2rem;
-            font-weight: 500;
-            color: var(--sage-green);
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c7a7b;
             margin-bottom: var(--space-md);
             text-align: center;
+            width: 100%;
         }
 
         .examples-grid {
@@ -229,10 +232,10 @@
         }
 
         .example-card {
-            background: var(--glass-bg);
+            background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: var(--border-radius);
             padding: var(--space-sm);
             cursor: pointer;
@@ -255,7 +258,7 @@
 
         .example-card:hover {
             transform: translateY(-2px);
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.95);
             box-shadow: 0 8px 20px rgba(107, 191, 154, 0.2);
         }
 
@@ -265,9 +268,10 @@
 
         .example-text {
             font-family: var(--font-secondary);
-            color: var(--earth-tone);
+            color: #2d3748;
             line-height: 1.4;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+            font-weight: 500;
         }
 
         /* Main Input Area - Center */
@@ -284,11 +288,13 @@
 
         .form-label {
             font-family: var(--font-secondary);
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: var(--sage-green);
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c7a7b;
             margin-bottom: var(--space-sm);
             text-align: center;
+            width: 100%;
+            display: block;
         }
 
         .form-textarea {
@@ -316,9 +322,10 @@
         }
 
         .form-textarea::placeholder {
-            color: var(--earth-tone);
-            opacity: 0.7;
+            color: #6b7280;
+            opacity: 0.8;
             text-align: center;
+            font-weight: 400;
         }
 
         /* Bottom Controls Section */
@@ -349,8 +356,8 @@
         .duration-label {
             font-family: var(--font-secondary);
             font-size: 1rem;
-            font-weight: 500;
-            color: var(--sage-green);
+            font-weight: 600;
+            color: #2c7a7b;
         }
 
         .duration-slider {
@@ -385,8 +392,8 @@
             text-align: center;
             font-family: var(--font-secondary);
             font-size: 1.2rem;
-            font-weight: 500;
-            color: var(--sage-green);
+            font-weight: 600;
+            color: #2c7a7b;
         }
 
         /* Checkbox */
@@ -434,10 +441,11 @@
 
         .checkbox-label {
             font-family: var(--font-secondary);
-            color: var(--earth-tone);
+            color: #4a5568;
             cursor: pointer;
             user-select: none;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            font-weight: 500;
             line-height: 1.4;
             max-width: 240px;
         }
@@ -750,10 +758,8 @@
                     <div class="circle-outer"></div>
                     <div class="circle-inner"></div>
                 </div>
-                <div>
-                    <h1 class="app-title">Hemi-gen</h1>
-                    <p class="app-subtitle">AI-Powered Hemi-Sync Meditation Generator</p>
-                </div>
+                <h1 class="app-title">Hemi-gen</h1>
+                <p class="app-subtitle">AI-Powered Hemi-Sync Meditation Generator</p>
             </div>
         </header>
 
