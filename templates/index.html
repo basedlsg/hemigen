@@ -137,6 +137,57 @@
                 transform: translateY(0);
             }
         }
+        .audio-player-container {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #34495e;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 700px;
+            border: 1px solid #4a6572;
+        }
+        .player-button {
+            background-color: #1abc9c;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .player-button:hover {
+            background-color: #16a085;
+        }
+        .player-button-small {
+            background-color: #7f8c8d;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s ease;
+        }
+        .player-button-small:hover {
+            background-color: #95a5a6;
+        }
+        .time-display {
+            font-size: 14px;
+            color: #bdc3c7;
+        }
+        .progress-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: #4a6572;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #1abc9c;
+        }
     </style>
 </head>
 <body>
@@ -157,7 +208,26 @@
         </form>
 
         <div id="loader" class="loader"></div>
-        <div id="messageArea" class="message-area"></div>
+        <div id="messageArea" class="message-area">
+            <!-- Success/Error messages will be populated here by JS -->
+            <!-- Player button will also be added here by JS -->
+        </div>
+
+        <!-- New Audio Player Structure (initially hidden) -->
+        <div id="audioPlayerContainer" class="audio-player-container" style="display: none;">
+            <h4 id="playerTrackTitle" style="margin-top: 0; margin-bottom: 10px; color: #ecf0f1;">Now Playing:</h4>
+            <audio id="meditationAudioElement" style="width: 100%; margin-bottom: 10px;"></audio> <!-- Can use default controls or custom -->
+            <!-- Custom controls example (if not using default) -->
+            <div id="customControls" style="display: flex; align-items: center; justify-content: space-between;">
+                <button id="playPauseButton" class="player-button">Play</button>
+                <span id="currentTime" class="time-display">0:00</span>
+                <div id="progressBarContainer" class="progress-bar-container">
+                    <div id="progressBar" class="progress-bar"></div>
+                </div>
+                <span id="totalTime" class="time-display">0:00</span>
+                <button id="closePlayerButton" class="player-button-small">Close</button>
+            </div>
+        </div>
         
         <div id="console-output-container" style="display: none;">
             <h3>Generation Log:</h3>
@@ -172,6 +242,17 @@
         const messageArea = document.getElementById('messageArea');
         const consoleOutputContainer = document.getElementById('console-output-container');
         const consoleOutput = document.getElementById('console-output');
+
+        // New Player Element References
+        const audioPlayerContainer = document.getElementById('audioPlayerContainer');
+        const playerTrackTitle = document.getElementById('playerTrackTitle');
+        const meditationAudioElement = document.getElementById('meditationAudioElement');
+        const playPauseButton = document.getElementById('playPauseButton');
+        const currentTimeDisplay = document.getElementById('currentTime'); // Renamed from currentTime
+        const progressBar = document.getElementById('progressBar');
+        const progressBarContainer = document.getElementById('progressBarContainer');
+        const totalTimeDisplay = document.getElementById('totalTime'); // Renamed from totalTime
+        const closePlayerButton = document.getElementById('closePlayerButton');
 
         const simulatedLogMessages = [
             "Initiating meditation forging sequence...",
@@ -247,11 +328,42 @@
                 if (response.ok && data.status === 'success') {
                     appendToConsole(`Server: Meditation \"${data.filename}\" created.`);
                     appendToConsole(`Server: Download URL: ${data.download_url}`);
-                    messageArea.innerHTML = `
-                        <div class="message success">
-                            <p>Meditation "${data.filename}" forged successfully!</p>
-                            <a href="${data.download_url}" class="download-link">Download MP3</a>
-                        </div>`;
+                    
+                    // Clear previous messages and create new ones
+                    messageArea.innerHTML = ''; // Clear previous content
+
+                    const successDiv = document.createElement('div');
+                    successDiv.className = 'message success';
+
+                    const successP = document.createElement('p');
+                    successP.textContent = `Meditation "${data.filename}" forged successfully!`;
+                    successDiv.appendChild(successP);
+
+                    // Play Button
+                    const playButton = document.createElement('button');
+                    playButton.textContent = 'Play Meditation';
+                    playButton.className = 'player-button'; // Using new player button style
+                    playButton.style.marginRight = '10px';
+                    playButton.onclick = () => {
+                        playerTrackTitle.textContent = `Now Playing: ${data.filename}`;
+                        meditationAudioElement.src = data.download_url;
+                        meditationAudioElement.load(); // Good practice to load before play
+                        meditationAudioElement.play().catch(e => console.error("Error playing audio:", e));
+                        playPauseButton.textContent = 'Pause';
+                        audioPlayerContainer.style.display = 'block';
+                    };
+                    successDiv.appendChild(playButton);
+
+                    // Download MP3 Button
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = data.download_url;
+                    downloadLink.textContent = 'Download MP3';
+                    downloadLink.className = 'download-link'; // Existing style, works well as a button
+                    // downloadLink.setAttribute('download', data.filename); // Optional: suggest filename
+                    successDiv.appendChild(downloadLink);
+                    
+                    messageArea.appendChild(successDiv);
+
                 } else {
                     appendToConsole(`Server ERROR: ${data.message || 'Unknown error'}`);
                     messageArea.innerHTML = `<div class="message error"><p><strong>Error:</strong> ${data.message || 'Failed to generate meditation.'}</p></div>`;
@@ -266,6 +378,60 @@
             submitButton.disabled = false;
             submitButton.value = 'Forge Meditation';
         });
+
+        // Player Event Listeners
+        playPauseButton.addEventListener('click', () => {
+            if (meditationAudioElement.paused || meditationAudioElement.ended) {
+                meditationAudioElement.play().catch(e => console.error("Error playing audio:", e));
+                playPauseButton.textContent = 'Pause';
+            } else {
+                meditationAudioElement.pause();
+                playPauseButton.textContent = 'Play';
+            }
+        });
+
+        meditationAudioElement.addEventListener('loadedmetadata', () => {
+            totalTimeDisplay.textContent = formatTime(meditationAudioElement.duration);
+        });
+
+        meditationAudioElement.addEventListener('timeupdate', () => {
+            currentTimeDisplay.textContent = formatTime(meditationAudioElement.currentTime);
+            const progressPercent = (meditationAudioElement.currentTime / meditationAudioElement.duration) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+        });
+
+        meditationAudioElement.addEventListener('ended', () => {
+            playPauseButton.textContent = 'Play';
+            progressBar.style.width = '0%'; // Reset progress bar
+            currentTimeDisplay.textContent = formatTime(0);
+        });
+
+        closePlayerButton.addEventListener('click', () => {
+            meditationAudioElement.pause();
+            meditationAudioElement.src = ''; // Stop loading/buffering
+            audioPlayerContainer.style.display = 'none';
+            playPauseButton.textContent = 'Play';
+            progressBar.style.width = '0%';
+            currentTimeDisplay.textContent = formatTime(0);
+            totalTimeDisplay.textContent = formatTime(0);
+        });
+
+        progressBarContainer.addEventListener('click', (e) => {
+            const rect = progressBarContainer.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const width = progressBarContainer.offsetWidth;
+            const duration = meditationAudioElement.duration;
+            if (duration) { // Make sure duration is available
+                meditationAudioElement.currentTime = (clickX / width) * duration;
+            }
+        });
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+        }
+
     </script>
 </body>
 </html> 

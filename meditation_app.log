@@ -1,0 +1,254 @@
+============================================================
+🧘 AI Meditation Generator Starting...
+============================================================
+🌐 Server will be available at: http://127.0.0.1:5001
+🌐 Or try: http://localhost:5001
+💡 Press Ctrl+C to stop the server
+============================================================
+ * Serving Flask app 'meditation_web_app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:5001
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 159-282-639
+127.0.0.1 - - [13/Jun/2025 16:00:26] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:00:42] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:00:53] "POST /generate HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:00:53] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:00:54] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:00:55] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:00:56] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:00:57] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:00:58] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:00:59] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:00] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:01] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:02] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:03] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:04] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:05] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:06] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:07] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:09] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:10] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:11] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:12] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:13] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:14] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:15] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:16] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:17] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:19] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:20] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:21] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:22] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:23] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:24] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:25] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:26] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:27] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:29] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:30] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:31] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:32] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:33] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:34] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:35] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:36] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:38] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:39] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:40] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:41] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:42] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:43] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:44] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:45] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:46] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:48] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:49] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:50] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:51] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:52] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:53] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:54] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:55] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:57] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:58] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:01:59] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:00] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:01] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:02] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:03] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:04] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:05] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:07] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:08] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:09] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:10] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:11] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:12] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:13] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:14] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:15] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:17] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:18] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:19] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:20] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:21] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:22] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:25] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:26] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:27] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:28] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:29] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:30] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:31] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:32] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:33] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:35] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:36] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:37] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:38] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:39] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:40] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:41] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:42] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:43] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:45] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:46] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:47] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:48] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:49] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:50] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:51] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/Users/carlos/Focus-Creation/meditation_web_app.py", line 279, in process_meditation_request
+    session[f"result_{session_id}"] = result
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/carlos/miniforge3_x86_64/lib/python3.12/site-packages/werkzeug/local.py", line 318, in __get__
+    obj = instance._get_current_object()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/carlos/miniforge3_x86_64/lib/python3.12/site-packages/werkzeug/local.py", line 519, in _get_current_object
+    raise RuntimeError(unbound_message) from None
+RuntimeError: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+Exception in thread Thread-5 (process_meditation_request):
+Traceback (most recent call last):
+  File "/Users/carlos/miniforge3_x86_64/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+    self.run()
+  File "/Users/carlos/miniforge3_x86_64/lib/python3.12/threading.py", line 1012, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/carlos/Focus-Creation/meditation_web_app.py", line 284, in process_meditation_request
+    session[f"result_{session_id}"] = {"status": "error", "error": str(e)}
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/carlos/miniforge3_x86_64/lib/python3.12/site-packages/werkzeug/local.py", line 318, in __get__
+    obj = instance._get_current_object()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/carlos/miniforge3_x86_64/lib/python3.12/site-packages/werkzeug/local.py", line 519, in _get_current_object
+    raise RuntimeError(unbound_message) from None
+RuntimeError: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+127.0.0.1 - - [13/Jun/2025 16:02:52] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:53] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:55] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:56] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:57] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:58] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:02:59] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:00] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:01] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:02] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:03] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:04] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:06] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:07] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:08] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:09] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:10] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:11] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:12] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:13] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:14] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:15] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:16] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:17] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:18] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:19] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:20] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:21] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:22] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:23] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:24] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:25] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:26] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:27] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:28] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:29] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:30] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:31] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:32] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:33] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:34] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:35] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:36] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:37] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:38] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:39] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:40] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:41] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:42] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:43] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:44] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:45] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:46] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:47] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:48] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:49] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:50] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:51] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:52] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:53] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:54] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:55] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:56] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:57] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:03:58] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:00] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:01] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:02] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:03] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:04] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:05] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:06] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:07] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:08] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:09] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:10] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:11] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:12] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:13] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:14] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:15] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:16] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:17] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:18] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:19] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:20] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:21] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:22] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:23] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:24] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:25] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:26] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:27] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jun/2025 16:04:28] "GET /progress/3f05179c6f562e38 HTTP/1.1" 200 -
+/Users/carlos/miniforge3_x86_64/lib/python3.12/multiprocessing/resource_tracker.py:279: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '

@@ -1,3 +1,13 @@
 *.mp3
 *.MP3
-__pycache__/ 
+__pycache__/
+*.pyc
+.env
+.env.local
+.env.production
+transcripts/
+generated_meditations/
+meditation_app_*.log
+.DS_Store
+.claude/
+zen-mcp-server/ 
