@@ -2,10 +2,10 @@
 google-generativeai==0.8.3
 redis==5.0.1
 requests==2.31.0
+elevenlabs==0.2.27
+pydub==0.25.1
 
 # Legacy Flask app dependencies (kept for compatibility)
 Flask==3.0.0
-elevenlabs==0.2.27
-pydub==0.25.1
 gunicorn==21.2.0
 python-dotenv==1.0.0

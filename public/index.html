@@ -694,12 +694,10 @@
         </section>
 
         <section class="result-section" id="resultSection">
-            <h2 class="result-title">Your Personalized Meditation Script 🧘‍♀️</h2>
+            <h2 class="result-title">Your Personalized Meditation 🧘‍♀️</h2>
             <div class="result-content" id="resultContent"></div>
-            <div style="text-align: center;">
-                <a href="#" class="download-button" id="downloadBtn" download>
-                    📄 Download as Text File
-                </a>
+            <div class="download-buttons" style="text-align: center; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; flex-direction: column;">
+                <!-- Download buttons will be inserted here dynamically -->
             </div>
         </section>
     </div>
@@ -828,11 +826,42 @@
                 this.resultSection.style.display = 'block';
                 this.resultSection.scrollIntoView({ behavior: 'smooth' });
 
-                // Set up download
-                const blob = new Blob([this.formatForDownload(data)], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                this.downloadBtn.href = url;
-                this.downloadBtn.download = `meditation-${Date.now()}.txt`;
+                // Update download buttons container
+                const downloadContainer = document.querySelector('.download-buttons') || 
+                    this.downloadBtn.parentElement;
+                downloadContainer.innerHTML = '';
+
+                // Text download
+                const textBlob = new Blob([this.formatForDownload(data)], { type: 'text/plain' });
+                const textUrl = URL.createObjectURL(textBlob);
+                const textBtn = document.createElement('a');
+                textBtn.href = textUrl;
+                textBtn.download = `meditation-script-${Date.now()}.txt`;
+                textBtn.className = 'download-button';
+                textBtn.innerHTML = '📄 Download Script';
+                downloadContainer.appendChild(textBtn);
+
+                // Audio download (if available)
+                if (data.audio_available && data.audio_data) {
+                    const audioBytes = Uint8Array.from(atob(data.audio_data), c => c.charCodeAt(0));
+                    const audioBlob = new Blob([audioBytes], { type: 'audio/mpeg' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const audioBtn = document.createElement('a');
+                    audioBtn.href = audioUrl;
+                    audioBtn.download = `meditation-audio-${Date.now()}.mp3`;
+                    audioBtn.className = 'download-button';
+                    audioBtn.innerHTML = '🎵 Download Audio (MP3)';
+                    audioBtn.style.marginLeft = '10px';
+                    downloadContainer.appendChild(audioBtn);
+
+                    // Add audio player
+                    const audioPlayer = document.createElement('audio');
+                    audioPlayer.controls = true;
+                    audioPlayer.src = audioUrl;
+                    audioPlayer.style.width = '100%';
+                    audioPlayer.style.marginTop = '15px';
+                    downloadContainer.appendChild(audioPlayer);
+                }
             }
 
             formatForDownload(data) {

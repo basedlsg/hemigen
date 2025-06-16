@@ -7,11 +7,27 @@ import google.generativeai as genai
 from http.server import BaseHTTPRequestHandler
 import redis
 import traceback
+import re
+import io
+import base64
+from elevenlabs.client import ElevenLabs
+from pydub import AudioSegment
 
-# Initialize Gemini
+# Initialize APIs
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+ELEVENLABS_API_KEY = os.environ.get('ELEVENLABS_API_KEY', 'sk_fe6faf571491c9b26bef909dce2e19a8e1d7239bf518027b')
+ELEVENLABS_VOICE_ID = os.environ.get('ELEVENLABS_VOICE_ID', '7nFoun39JV8WgdJ3vGmC')
+
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
+
+# Initialize ElevenLabs
+elevenlabs_client = None
+if ELEVENLABS_API_KEY:
+    try:
+        elevenlabs_client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
+    except Exception as e:
+        print(f"ElevenLabs initialization failed: {e}")
 
 # Redis for rate limiting (Upstash free tier)
 REDIS_URL = os.environ.get('REDIS_URL')
@@ -180,6 +196,80 @@ def generate_meditation_script(scenario, duration):
         traceback.print_exc()
         return None
 
+def synthesize_text_elevenlabs(text):
+    """Synthesize text using ElevenLabs API."""
+    if not elevenlabs_client:
+        print("ElevenLabs client not initialized")
+        return None
+    
+    try:
+        audio_data_iterator = elevenlabs_client.text_to_speech.convert(
+            voice_id=ELEVENLABS_VOICE_ID,
+            text=text,
+            model_id="eleven_multilingual_v2"
+        )
+        # Consume the iterator and join byte chunks
+        full_audio_bytes = b"".join(list(audio_data_iterator))
+        return full_audio_bytes
+    except Exception as e:
+        print(f"Error during ElevenLabs synthesis: {e}")
+        return None
+
+def create_meditation_audio(script_text):
+    """Create complete meditation audio with pauses."""
+    try:
+        if not script_text:
+            return None
+        
+        # Split script by pause markers
+        segments_raw = re.split(r'(\[PAUSE:\d+\])', script_text)
+        voice_track = AudioSegment.empty()
+        
+        for segment_text in segments_raw:
+            segment_text = segment_text.strip()
+            if not segment_text:
+                continue
+            
+            # Check if it's a pause marker
+            pause_match = re.match(r'\[PAUSE:(\d+)\]', segment_text)
+            if pause_match:
+                try:
+                    pause_duration_seconds = int(pause_match.group(1))
+                    print(f"Adding pause: {pause_duration_seconds}s")
+                    if pause_duration_seconds > 0:
+                        voice_track += AudioSegment.silent(duration=pause_duration_seconds * 1000)
+                except ValueError:
+                    print(f"Warning: Could not parse pause duration: {segment_text}")
+            elif segment_text:  # Text segment
+                print(f"Synthesizing: '{segment_text[:50]}...'")
+                audio_bytes = synthesize_text_elevenlabs(segment_text)
+                if audio_bytes:
+                    try:
+                        audio_segment = AudioSegment.from_file(io.BytesIO(audio_bytes), format="mp3")
+                        voice_track += audio_segment
+                    except Exception as e:
+                        print(f"Error creating audio segment: {e}")
+                        voice_track += AudioSegment.silent(duration=1000)  # 1 second silence as fallback
+                else:
+                    print(f"TTS failed for segment: '{segment_text[:50]}...'")
+                    voice_track += AudioSegment.silent(duration=1000)
+        
+        if len(voice_track) == 0:
+            print("Voice track is empty")
+            return None
+        
+        # Export to bytes
+        output_buffer = io.BytesIO()
+        voice_track.export(output_buffer, format="mp3")
+        output_buffer.seek(0)
+        
+        return output_buffer.getvalue()
+        
+    except Exception as e:
+        print(f"Error creating meditation audio: {e}")
+        traceback.print_exc()
+        return None
+
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
         try:
@@ -216,7 +306,7 @@ class handler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps(response).encode())
                 return
             
-            # Generate meditation
+            # Generate meditation script
             script = generate_meditation_script(scenario, duration)
             
             if not script:
@@ -227,15 +317,34 @@ class handler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps(response).encode())
                 return
             
-            # Success response
-            response = {
-                'success': True,
-                'script': script,
-                'scenario': scenario,
-                'duration': duration,
-                'generated_at': datetime.now().isoformat(),
-                'message': 'Your personalized Hemi-Sync meditation is ready!'
-            }
+            # Generate audio
+            audio_data = create_meditation_audio(script)
+            
+            if not audio_data:
+                # Fallback to text-only if audio generation fails
+                response = {
+                    'success': True,
+                    'script': script,
+                    'scenario': scenario,
+                    'duration': duration,
+                    'generated_at': datetime.now().isoformat(),
+                    'message': 'Meditation script generated! (Audio generation temporarily unavailable)',
+                    'audio_available': False
+                }
+            else:
+                # Convert audio to base64 for transmission
+                audio_base64 = base64.b64encode(audio_data).decode('utf-8')
+                
+                response = {
+                    'success': True,
+                    'script': script,
+                    'audio_data': audio_base64,
+                    'scenario': scenario,
+                    'duration': duration,
+                    'generated_at': datetime.now().isoformat(),
+                    'message': 'Your personalized Hemi-Sync meditation with audio is ready!',
+                    'audio_available': True
+                }
             
             self.wfile.write(json.dumps(response).encode())
             
