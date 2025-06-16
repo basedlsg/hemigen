@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hemi-gen - Free AI Meditation Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <meta name="description" content="Generate personalized Hemi-Sync meditation scripts instantly. Free AI-powered meditation creation with Monroe Institute techniques.">
+    <meta property="og:title" content="Hemi-gen - Free AI Meditation Generator">
+    <meta property="og:description" content="Create personalized Hemi-Sync meditations instantly with AI. Based on Monroe Institute techniques.">
+    <style>
+        :root {
+            --primary-blue: #87CEEB;
+            --primary-blue-dark: #5FA8C4;
+            --sage-green: #6BBF9A;
+            --sage-green-light: #E3F6E5;
+            --earth-tone: #9CA39C;
+            --mocha-mousse: #B8A082;
+            --glass-bg: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: rgba(0, 0, 0, 0.1);
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-secondary: 'Nunito', sans-serif;
+            --space-xs: 8px;
+            --space-sm: 16px;
+            --space-md: 24px;
+            --space-lg: 32px;
+            --space-xl: 40px;
+            --space-2xl: 48px;
+            --space-3xl: 60px;
+            --touch-target: 48px;
+            --border-radius: 16px;
+            --border-radius-lg: 24px;
+            --transition-calm: all 200ms ease-in-out;
+            --transition-breathe: all 4000ms ease-in-out;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            font-size: 16px;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        .background-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--sage-green-light), var(--primary-blue));
+            opacity: 0.08;
+            animation: float 25s ease-in-out infinite;
+        }
+
+        .floating-shape:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            top: 5%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .floating-shape:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 70%;
+            right: 10%;
+            animation-delay: -8s;
+        }
+
+        .floating-shape:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            bottom: 10%;
+            left: 40%;
+            animation-delay: -16s;
+        }
+
+        .floating-shape:nth-child(4) {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            right: 30%;
+            animation-delay: -24s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-30px) rotate(5deg); }
+            50% { transform: translateY(-15px) rotate(-3deg); }
+            75% { transform: translateY(-25px) rotate(3deg); }
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--space-md);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-lg) 0;
+            margin-bottom: var(--space-xl);
+        }
+
+        .app-branding {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-sm);
+            text-align: center;
+        }
+
+        .breathing-circle {
+            width: 50px;
+            height: 50px;
+            position: relative;
+        }
+
+        .circle-outer {
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--sage-green);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: breathe 8s ease-in-out infinite;
+        }
+
+        .circle-inner {
+            width: 60%;
+            height: 60%;
+            background: linear-gradient(135deg, var(--sage-green), var(--primary-blue));
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: breathe-inner 8s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            25% { transform: scale(1.1); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+            75% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        @keyframes breathe-inner {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            25% { transform: translate(-50%, -50%) scale(0.9); }
+            50% { transform: translate(-50%, -50%) scale(0.8); }
+            75% { transform: translate(-50%, -50%) scale(0.9); }
+        }
+
+        .app-title {
+            font-family: var(--font-secondary);
+            font-size: 2.2rem;
+            font-weight: 400;
+            color: #2c7a7b;
+            letter-spacing: -0.02em;
+        }
+
+        .app-subtitle {
+            font-size: 1rem;
+            color: #4a5568;
+            font-weight: 400;
+            text-align: center;
+            margin-top: var(--space-xs);
+        }
+
+        .free-badge {
+            background: linear-gradient(135deg, var(--sage-green), var(--primary-blue));
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: var(--space-xs);
+        }
+
+        .examples-section {
+            margin-bottom: var(--space-lg);
+        }
+
+        .examples-title {
+            font-family: var(--font-secondary);
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c7a7b;
+            margin-bottom: var(--space-md);
+            text-align: center;
+            width: 100%;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: var(--space-sm);
+            padding: var(--space-sm);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+        }
+
+        .example-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--border-radius);
+            padding: var(--space-sm);
+            cursor: pointer;
+            transition: var(--transition-calm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .example-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(135deg, var(--sage-green), var(--primary-blue));
+            transform: scaleY(0);
+            transition: var(--transition-calm);
+        }
+
+        .example-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 8px 20px rgba(107, 191, 154, 0.2);
+        }
+
+        .example-card:hover::before {
+            transform: scaleY(1);
+        }
+
+        .example-text {
+            font-family: var(--font-secondary);
+            color: #2d3748;
+            line-height: 1.4;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .main-input-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-lg);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-label {
+            font-family: var(--font-secondary);
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c7a7b;
+            margin-bottom: var(--space-sm);
+            text-align: center;
+            width: 100%;
+            display: block;
+        }
+
+        .form-textarea {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid transparent;
+            border-radius: var(--border-radius);
+            padding: var(--space-md);
+            font-family: var(--font-primary);
+            font-size: 16px;
+            color: #1e293b;
+            transition: var(--transition-calm);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            min-height: 140px;
+            resize: vertical;
+            line-height: 1.6;
+            width: 100%;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--sage-green);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 0 4px rgba(107, 191, 154, 0.1);
+        }
+
+        .form-textarea::placeholder {
+            color: #6b7280;
+            opacity: 0.8;
+            text-align: center;
+            font-weight: 400;
+        }
+
+        .bottom-controls {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+            align-items: center;
+            margin-bottom: var(--space-3xl);
+        }
+
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3xl);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .duration-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-sm);
+            min-width: 200px;
+        }
+
+        .duration-label {
+            font-family: var(--font-secondary);
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2c7a7b;
+        }
+
+        .duration-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 8px;
+            background: linear-gradient(90deg, var(--sage-green-light), var(--sage-green));
+            border-radius: 4px;
+            outline: none;
+            transition: var(--transition-calm);
+            width: 200px;
+        }
+
+        .duration-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--sage-green);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(107, 191, 154, 0.3);
+            transition: var(--transition-calm);
+        }
+
+        .duration-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(107, 191, 154, 0.4);
+        }
+
+        .duration-display {
+            text-align: center;
+            font-family: var(--font-secondary);
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c7a7b;
+        }
+
+        .generate-button {
+            background: linear-gradient(135deg, var(--sage-green), var(--primary-blue));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: var(--space-md) var(--space-3xl);
+            font-family: var(--font-secondary);
+            font-size: 1.2rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-calm);
+            position: relative;
+            overflow: hidden;
+            min-height: var(--touch-target);
+        }
+
+        .generate-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: var(--transition-calm);
+        }
+
+        .generate-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(107, 191, 154, 0.3);
+        }
+
+        .generate-button:hover::before {
+            left: 100%;
+        }
+
+        .generate-button:disabled {
+            background: var(--earth-tone);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: var(--space-sm);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .result-section {
+            display: none;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-xl);
+            margin-top: var(--space-lg);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-title {
+            font-family: var(--font-secondary);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--sage-green);
+            margin-bottom: var(--space-md);
+            text-align: center;
+        }
+
+        .result-content {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: var(--border-radius);
+            padding: var(--space-md);
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: var(--font-primary);
+            line-height: 1.6;
+            color: #1e293b;
+            white-space: pre-wrap;
+            margin-bottom: var(--space-md);
+        }
+
+        .download-button {
+            background: linear-gradient(135deg, var(--primary-blue), var(--sage-green));
+            color: white;
+            text-decoration: none;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--border-radius);
+            font-family: var(--font-secondary);
+            font-weight: 500;
+            transition: var(--transition-calm);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .download-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(135, 206, 235, 0.3);
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #dc2626;
+            padding: var(--space-md);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--space-md);
+            text-align: center;
+            display: none;
+        }
+
+        .rate-limit-info {
+            background: rgba(249, 115, 22, 0.1);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            color: #ea580c;
+            padding: var(--space-sm);
+            border-radius: var(--border-radius);
+            margin-top: var(--space-md);
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                padding: var(--space-sm);
+            }
+
+            .app-title {
+                font-size: 1.8rem;
+            }
+
+            .examples-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .controls-row {
+                flex-direction: column;
+                gap: var(--space-lg);
+            }
+
+            .duration-container {
+                min-width: 280px;
+            }
+
+            .bottom-controls {
+                margin-bottom: var(--space-2xl);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-input-section {
+                padding: var(--space-md);
+            }
+
+            .generate-button {
+                width: 100%;
+                padding: var(--space-md);
+            }
+
+            .breathing-circle {
+                width: 40px;
+                height: 40px;
+            }
+
+            .app-title {
+                font-size: 1.6rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .floating-shape,
+            .circle-outer,
+            .circle-inner,
+            .generate-button::before {
+                animation: none;
+            }
+            
+            * {
+                transition: none !important;
+            }
+        }
+
+        .form-textarea:focus-visible,
+        .generate-button:focus-visible,
+        .example-card:focus-visible,
+        .download-button:focus-visible {
+            outline: 3px solid var(--sage-green);
+            outline-offset: 2px;
+        }
+
+        @media (prefers-contrast: high) {
+            :root {
+                --glass-bg: rgba(255, 255, 255, 0.95);
+                --glass-border: rgba(0, 0, 0, 0.5);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-elements">
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+    </div>
+
+    <div class="app-container">
+        <header class="header">
+            <div class="app-branding">
+                <div class="breathing-circle" role="img" aria-label="Breathing meditation circle">
+                    <div class="circle-outer"></div>
+                    <div class="circle-inner"></div>
+                </div>
+                <h1 class="app-title">Hemi-gen</h1>
+                <p class="app-subtitle">AI-Powered Hemi-Sync Meditation Generator</p>
+                <div class="free-badge">100% Free • No API Keys Required</div>
+            </div>
+        </header>
+
+        <section class="examples-section">
+            <h3 class="examples-title">Popular Meditation Intentions</h3>
+            <div class="examples-grid" id="examplesList">
+                <div class="example-card" tabindex="0" role="button">
+                    <p class="example-text">Manifesting $90,000 for financial freedom and abundance</p>
+                </div>
+                <div class="example-card" tabindex="0" role="button">
+                    <p class="example-text">Attracting my ideal romantic partner and soulmate connection</p>
+                </div>
+                <div class="example-card" tabindex="0" role="button">
+                    <p class="example-text">Healing anxiety and developing unshakeable inner peace</p>
+                </div>
+                <div class="example-card" tabindex="0" role="button">
+                    <p class="example-text">Achieving perfect health with radiant skin and vitality</p>
+                </div>
+                <div class="example-card" tabindex="0" role="button">
+                    <p class="example-text">Launching a successful and fulfilling business venture</p>
+                </div>
+                <div class="example-card" tabindex="0" role="button">
+                    <p class="example-text">Enhancing creativity and unlocking artistic expression</p>
+                </div>
+                <div class="example-card" tabindex="0" role="button">
+                    <p class="example-text">Developing psychic abilities and intuitive awareness</p>
+                </div>
+                <div class="example-card" tabindex="0" role="button">
+                    <p class="example-text">Releasing past trauma and embracing emotional freedom</p>
+                </div>
+            </div>
+        </section>
+
+        <main class="main-input-section">
+            <form id="meditationForm">
+                <label for="scenario" class="form-label">Describe Your Meditation Intention</label>
+                <textarea 
+                    id="scenario" 
+                    name="scenario" 
+                    class="form-textarea"
+                    placeholder="What would you like to manifest, heal, or explore? Be as specific as possible about your desired outcome..."
+                    required
+                    maxlength="500"
+                    aria-describedby="scenario-help"
+                ></textarea>
+                <div class="rate-limit-info">
+                    ℹ️ Each device can generate 3 free meditations per 24 hours to ensure quality service for everyone.
+                </div>
+            </form>
+        </main>
+
+        <section class="bottom-controls">
+            <div class="controls-row">
+                <div class="duration-container">
+                    <div class="duration-label">Duration</div>
+                    <input 
+                        type="range" 
+                        id="duration" 
+                        name="duration" 
+                        min="10" 
+                        max="60" 
+                        value="25" 
+                        class="duration-slider"
+                        aria-describedby="duration-display"
+                    >
+                    <div id="duration-display" class="duration-display">25 minutes</div>
+                </div>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+
+            <button type="submit" class="generate-button" id="generateBtn" form="meditationForm">
+                <div class="loading-spinner" id="loadingSpinner"></div>
+                <span id="buttonText">Create Meditation</span>
+            </button>
+        </section>
+
+        <section class="result-section" id="resultSection">
+            <h2 class="result-title">Your Personalized Meditation Script 🧘‍♀️</h2>
+            <div class="result-content" id="resultContent"></div>
+            <div style="text-align: center;">
+                <a href="#" class="download-button" id="downloadBtn" download>
+                    📄 Download as Text File
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        class HemiGenApp {
+            constructor() {
+                this.form = document.getElementById('meditationForm');
+                this.generateBtn = document.getElementById('generateBtn');
+                this.buttonText = document.getElementById('buttonText');
+                this.loadingSpinner = document.getElementById('loadingSpinner');
+                this.scenarioInput = document.getElementById('scenario');
+                this.durationSlider = document.getElementById('duration');
+                this.durationDisplay = document.getElementById('duration-display');
+                this.errorMessage = document.getElementById('errorMessage');
+                this.resultSection = document.getElementById('resultSection');
+                this.resultContent = document.getElementById('resultContent');
+                this.downloadBtn = document.getElementById('downloadBtn');
+                
+                this.initializeEventListeners();
+                this.initializeDurationSlider();
+                this.initializeExampleCards();
+            }
+
+            initializeEventListeners() {
+                this.form.addEventListener('submit', this.handleSubmit.bind(this));
+            }
+
+            initializeDurationSlider() {
+                this.durationSlider.addEventListener('input', (e) => {
+                    this.durationDisplay.textContent = `${e.target.value} minutes`;
+                });
+            }
+
+            initializeExampleCards() {
+                const exampleCards = document.querySelectorAll('.example-card');
+                exampleCards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        const text = card.querySelector('.example-text').textContent;
+                        this.scenarioInput.value = text;
+                        this.scenarioInput.focus();
+                    });
+
+                    card.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            card.click();
+                        }
+                    });
+                });
+            }
+
+            showError(message) {
+                this.errorMessage.textContent = message;
+                this.errorMessage.style.display = 'block';
+                setTimeout(() => {
+                    this.errorMessage.style.display = 'none';
+                }, 5000);
+            }
+
+            setLoading(isLoading) {
+                this.generateBtn.disabled = isLoading;
+                if (isLoading) {
+                    this.loadingSpinner.style.display = 'block';
+                    this.buttonText.textContent = 'Creating your meditation...';
+                } else {
+                    this.loadingSpinner.style.display = 'none';
+                    this.buttonText.textContent = 'Create Meditation';
+                }
+            }
+
+            async handleSubmit(e) {
+                e.preventDefault();
+                
+                const scenario = this.scenarioInput.value.trim();
+                const duration = parseInt(this.durationSlider.value);
+
+                // Client-side validation
+                if (!scenario) {
+                    this.showError('Please describe your meditation intention');
+                    return;
+                }
+
+                if (scenario.length < 10) {
+                    this.showError('Please provide a more detailed description (at least 10 characters)');
+                    return;
+                }
+
+                if (scenario.length > 500) {
+                    this.showError('Please keep your intention under 500 characters');
+                    return;
+                }
+
+                this.resultSection.style.display = 'none';
+                this.setLoading(true);
+
+                try {
+                    const response = await fetch('/api/generate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            scenario,
+                            duration
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.displayResult(data);
+                    } else {
+                        this.showError(data.error || 'Failed to generate meditation');
+                    }
+                } catch (error) {
+                    console.error('Generation error:', error);
+                    this.showError('Network error. Please check your connection and try again.');
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+
+            displayResult(data) {
+                this.resultContent.textContent = data.script;
+                this.resultSection.style.display = 'block';
+                this.resultSection.scrollIntoView({ behavior: 'smooth' });
+
+                // Set up download
+                const blob = new Blob([this.formatForDownload(data)], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                this.downloadBtn.href = url;
+                this.downloadBtn.download = `meditation-${Date.now()}.txt`;
+            }
+
+            formatForDownload(data) {
+                return `Hemi-gen Meditation Script
+${'='.repeat(50)}
+Intention: ${data.scenario}
+Duration: ${data.duration} minutes
+Generated: ${new Date(data.generated_at).toLocaleString()}
+Technology: Hemi-Sync + AI-Generated Script
+
+${'='.repeat(50)}
+
+${data.script}
+
+${'='.repeat(50)}
+Generated by Hemi-gen - Free AI Meditation Generator
+Visit: https://your-domain.com
+`;
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            new HemiGenApp();
+        });
+    </script>
+</body>
+</html>

@@ -6,16 +6,34 @@ from pydub import AudioSegment
 import re
 import io
 import json # For potential future communication with MCP server
+import google.generativeai as genai # Import Gemini library
 
-# --- ElevenLabs API Key Configuration ---
+# --- API Key Configurations ---
 ELEVENLABS_API_KEY = "sk_fe6faf571491c9b26bef909dce2e19a8e1d7239bf518027b" # User provided
 ELEVENLABS_VOICE_ID = "7nFoun39JV8WgdJ3vGmC" # User provided
+
+# IMPORTANT: For deployment, this should be an environment variable.
+# For local testing and development, ensure it's set correctly.
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyAqko3NqGS-GtXhzm8LeiZ3xUEyo_XIqLo") # User provided, with fallback for os.environ
+
+if not GEMINI_API_KEY or GEMINI_API_KEY == "AIzaSyAqko3NqGS-GtXhzm8LeiZ3xUEyo_XIqLo": # Check if it's the placeholder or not found
+    print("WARNING: GEMINI_API_KEY is using the hardcoded placeholder or was not found in environment variables. Direct Gemini calls might fail if this key is invalid or has restrictions.")
+    if not os.environ.get("GEMINI_API_KEY"):
+        print("         Consider setting the GEMINI_API_KEY environment variable for robust configuration.")
+
+try:
+    genai.configure(api_key=GEMINI_API_KEY)
+    print("Gemini API configured successfully.")
+except Exception as e:
+    print(f"ERROR: Failed to configure Gemini API: {e}. Please check your API key.")
+    # Potentially exit or prevent further Gemini-dependent operations if critical
 
 # MODIFIED: Instantiate ElevenLabs client
 elevenlabs_client = None
 if ELEVENLABS_API_KEY:
     try:
         elevenlabs_client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
+        print("ElevenLabs client initialized successfully.")
     except Exception as e:
         print(f"Failed to initialize ElevenLabs client: {e}")
 else:
@@ -42,116 +60,95 @@ A Hemi-Sync/Monroe-style meditation script typically follows this flow:
 7.  **Return to C-1 (Waking Consciousness)**: Count down (e.g., 10-1 or from the current Focus level), guiding the listener back to full alertness, feeling refreshed and positive. (~2-3 minutes, including pauses)
 8.  **Closing**: Brief positive reinforcement and integration suggestion related to the `user_goal`. (~0.5-1 minute of speech)
 
-Instructions for AI (Gemini via zen-mcp-server):
+Instructions for AI (Gemini):
 *   Adhere to this structure and the spirit of the Monroe Institute's Gateway Experience.
-*   The total script length (speech + pauses) should be crafted to fit the `total_duration_minutes` passed by the user (the placeholder will use a simplified `main_content_duration_minutes`).
+*   The total script length (speech + pauses) should be crafted to fit the `total_duration_minutes` passed by the user.
 *   Integrate the specific `user_goal` naturally and creatively into sections 1 (aim), 4 (affirmation), 6 (core themed content), and 8 (closing/integration).
 *   Use clear, calm, reassuring, and evocative language. Employ present tense and suggestive phrasing (e.g., "you may perceive...", "allow yourself to experience...").
 *   Intersperse `[PAUSE:X]` (where X is seconds) markers thoughtfully throughout the script, especially in section 6 and during Focus level inductions/returns. Typical pauses might range from 5 to 60 seconds. Longer pauses can be used for deeper reflection or experiential segments.
 *   The dialogue must be original and insightful, drawing inspiration from the Monroe style but tailored to the user's goal. Do not simply copy existing scripts.
 *   Output *only* the script text, including the `[PAUSE:X]` markers, ready for TTS.
 *   Ensure the script is coherent, flows well, and is of high quality, suitable for a guided meditation.
+*   For a '{total_duration_minutes}' minute meditation on the theme '{user_goal}', generate the full script now.
 """
 
-# --- PLACEHOLDER FOR MCP SERVER INTERACTION ---
-def call_mcp_server_for_script_generation(user_goal, total_duration_minutes, structure_summary):
-    """
-    Placeholder for calling the zen-mcp-server to get AI-generated script.
-    This function simulates the AI's response for now.
-    YOU WILL NEED TO REPLACE THE BODY OF THIS FUNCTION with actual code to:
-    1. Construct a detailed prompt for Gemini, including the user_goal, total_duration_minutes,
-       and the MONROE_STRUCTURE_SUMMARY.
-    2. Make an HTTP POST request to your local zen-mcp-server endpoint
-       (e.g., http://localhost:YOUR_MCP_PORT/generate-script or similar).
-    3. The zen-mcp-server should be configured with your GEMINI_API_KEY in its .env file.
-    4. Receive and return the AI-generated script text from the server response.
-    """
-    print(f"\n=== SIMULATING AI SCRIPT GENERATION (via MCP placeholder) ===")
+# --- DIRECT GEMINI API CALL FUNCTION ---
+def generate_script_with_gemini(user_goal, total_duration_minutes, structure_summary):
+    print(f"\n=== Calling Gemini API for Script Generation ===")
     print(f"  User Goal: {user_goal}")
     print(f"  Requested Total Duration: {total_duration_minutes} minutes")
 
-    # Simplified calculation for themed content in this placeholder
-    # A real AI would manage total time more dynamically based on content generation.
-    approx_fixed_parts_speech_time = 7 # Rough estimate for intro, box, tuning, F10 induction, return, closing (speech only)
-    # Pauses for fixed parts might add another 3-5 minutes. Let's say total fixed parts duration is ~10-12 mins with pauses.
-    # For a 10-minute total duration, main content will be very short or mostly integrated.
-    main_content_target_speech_minutes = max(1, total_duration_minutes - 8) # Ensure at least 1 min speech for theme
+    # Construct the prompt for Gemini
+    # The MONROE_STRUCTURE_SUMMARY already includes placeholders for these, but we can re-emphasize.
+    prompt = f"{structure_summary.format(user_goal=user_goal, total_duration_minutes=total_duration_minutes)}"
+    prompt += f"\n\nGenerate a Hemi-Sync style meditation script of approximately {total_duration_minutes} minutes (including pauses) for the goal: '{user_goal}'."
+    prompt += "\nThe script should be complete, from introduction to closing, with [PAUSE:X] markers."
     
-    # Simulated script structure (very basic for the placeholder)
-    script = f"""[INFO: This is a SIMULATED AI-generated script. Implement actual MCP call to Gemini.]
+    try:
+        # model = genai.GenerativeModel('gemini-1.5-flash-latest') # Good for speed and general tasks
+        model = genai.GenerativeModel('gemini-1.5-pro-latest') # Better for complex generation and longer context
+        
+        # Configuration for generation (can be tuned)
+        generation_config = genai.types.GenerationConfig(
+            temperature=0.75, # Controls randomness. Lower is more predictable.
+            top_p=0.95,
+            top_k=64,
+            max_output_tokens=8192, # Max for Pro model
+            # response_mime_type="text/plain", # Ensure text output
+        )
+        safety_settings = [
+            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"}, # Allowing more esoteric/body-related terms for meditation
+            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+        ]
 
-Welcome. Today, our journey is to explore {user_goal}, moving into a state of expanded awareness.
-[PAUSE:10]
-Find a comfortable position. Loosen any tight clothing. Gently close your eyes.
-[PAUSE:10]
-Now, in your mind's eye, create your Energy Conversion Box. This is your mental container to hold any concerns or distractions. Place them inside, close the lid, and set them aside.
-[PAUSE:20]
-Let's begin our Resonant Tuning. Breathe slightly deeper than normal. As you inhale, pull sparkling, vibrant energy into all parts of your body. As you exhale, create a gentle humming sound... hmmmmmmm. Feel the vibrations. Do this a few times.
-[PAUSE:30]
-Repeat this Affirmation mentally, after me: I am more than my physical body. Because I am more than physical matter, I can perceive that which is greater than the physical world. I am open to this experience, and I deeply desire to achieve {user_goal}.
-[PAUSE:15]
-We will now move into Focus 10, the state of mind awake, body asleep. I will count from one to ten.
-One... you are beginning to relax more and more.
-[PAUSE:5]
-Two... letting go of all physical tension.
-[PAUSE:5]
-Three... drifting deeper, calmly and comfortably.
-[PAUSE:5]
-Four... mind awake, body relaxed.
-[PAUSE:5]
-Five... your body is calm, comfortable, and at ease.
-[PAUSE:5]
-Six... deeper and deeper into profound relaxation.
-[PAUSE:5]
-Seven... just letting go completely.
-[PAUSE:5]
-Eight... mind remains awake and alert, body deeply asleep.
-[PAUSE:5]
-Nine... drifting into total relaxation, secure and comfortable.
-[PAUSE:5]
-Ten. You are now in Focus 10. A state of heightened awareness, mind fully awake, body profoundly asleep.
-[PAUSE:30]
+        print("Sending prompt to Gemini...")
+        # print(f"DEBUG PROMPT (first 300 chars): {prompt[:300]}...") # For debugging prompt issues
+        response = model.generate_content(
+            prompt,
+            generation_config=generation_config,
+            safety_settings=safety_settings,
+            stream=False # Get the full response at once
+        )
+        
+        # print(f"DEBUG Response Parts: {response.parts}")
+        # print(f"DEBUG Prompt Feedback: {response.prompt_feedback}")
+        # print(f"DEBUG Candidates: {response.candidates}")
 
-Now, in this state of heightened awareness, let us fully explore the pathway to {user_goal}.
-(AI would generate detailed guided imagery, affirmations, and instructions for approximately {main_content_target_speech_minutes} minutes of speech here, specifically tailored to '{user_goal}'. This section would integrate appropriate [PAUSE:X] markers, for example, [PAUSE:30] or [PAUSE:60] for reflection and experience. If the goal is manifestation, it might guide towards Focus 12 or 15 concepts.)
-Imagine {user_goal} as a present reality. Feel the emotions associated with this achievement. What does it look like? What does it feel like? Immerse yourself in this reality now.
-[PAUSE:60]
-(Further detailed guidance for '{user_goal}' based on its nature, e.g., steps for clean eating, sensations of clean skin, feelings of abundance for $90k, the experience of being at the university, or preparing for a transformative psychedelic journey by setting intentions and a safe space.)
-[PAUSE:60]
+        if response.parts:
+            generated_script = response.text
+            print("Script successfully generated by Gemini.")
+            return generated_script.strip()
+        elif response.prompt_feedback and response.prompt_feedback.block_reason:
+            reason = response.prompt_feedback.block_reason
+            block_message = f"[ERROR: Gemini prompt blocked. Reason: {reason}. Rating: {response.prompt_feedback.safety_ratings}]"
+            print(block_message)
+            return block_message
+        else:
+            print("ERROR: Gemini returned no content or an unexpected response structure.")
+            return "[ERROR: Gemini returned no content or unexpected structure.]"
 
-It is now time to return to full, waking physical consciousness, which we call C-1. Bring with you the new understandings and the positive energy focused on {user_goal}.
-I will count from ten down to one. At the count of one, you will be fully alert, refreshed, and ready to integrate this experience into your daily life.
-Ten... nine... beginning to return now, feeling energy and awareness returning to your physical body.
-[PAUSE:5]
-Eight... seven... becoming more aware of your physical surroundings.
-[PAUSE:5]
-Six... five... feeling energy returning to your arms and legs, your hands and feet.
-[PAUSE:5]
-Four... three... almost back now, feeling wonderful and refreshed, calm and centered.
-[PAUSE:5]
-Two... and one. Eyes open, fully awake. Wide awake, feeling fine and in perfect health, better than before. Carry the energy of {user_goal} with you.
-"""
-    return script.strip()
+    except Exception as e:
+        print(f"ERROR: An exception occurred during Gemini API call: {e}")
+        return f"[ERROR: Gemini API call failed: {str(e)}]"
 
-# --- NEW AI-POWERED SCRIPT GENERATION FUNCTION ---
+# --- AI-POWERED SCRIPT GENERATION FUNCTION (using direct Gemini call) ---
 def generate_meditation_script_with_ai(user_goal, total_duration_minutes):
-    """
-    Generates a meditation script using an AI (via MCP server placeholder).
-    """
-    print(f"\n--- Preparing to generate AI script for: '{user_goal}' ({total_duration_minutes} min) ---")
+    print(f"\n--- Preparing to generate AI script for: '{user_goal}' ({total_duration_minutes} min) using direct Gemini call ---")
     
-    ai_generated_script = call_mcp_server_for_script_generation(
+    ai_generated_script = generate_script_with_gemini(
         user_goal, 
         total_duration_minutes, 
         MONROE_STRUCTURE_SUMMARY
     )
 
-    if not ai_generated_script:
-        print(f"ERROR: AI (MCP Server placeholder) failed to generate script for goal '{user_goal}'.")
-        return None
+    if not ai_generated_script or ai_generated_script.startswith("[ERROR:"):
+        print(f"Failed to generate script from AI for '{user_goal}'. See error above.")
+        # Return the error message itself for logging/display
+        return ai_generated_script 
     
-    # Print the AI-generated script (transcript) for review during this phase
-    print(f"\n--- AI-Generated Transcript for '{user_goal}' (Simulated) ---")
+    print(f"\n--- AI-Generated Transcript for '{user_goal}' (Actual Gemini Output) ---")
     print(ai_generated_script)
     print(f"--- End of Transcript for '{user_goal}' ---")
     
@@ -284,7 +281,7 @@ def generate_complete_meditation(user_goal, total_duration_minutes, create_audio
 
         print(f"\n--- Proceeding to audio generation for: '{user_goal}' ---")
         safe_goal_name = re.sub(r'[^a-zA-Z0-9_\-]+', '_', user_goal) if user_goal else "ai_meditation"
-        output_filename_base = f"{safe_goal_name}_{total_duration_minutes}min_elevenlabs_AI.mp3"
+        output_filename_base = f"{safe_goal_name}_{total_duration_minutes}min_elevenlabs_AI_Gemini.mp3"
         
         generated_dir = "generated_meditations"
         os.makedirs(generated_dir, exist_ok=True)
@@ -310,53 +307,34 @@ def generate_complete_meditation(user_goal, total_duration_minutes, create_audio
         return script_text
 
 
-# --- MAIN EXECUTION FOR DEBUGGING AI TRANSCRIPTS ---
+# --- MAIN EXECUTION FOR GENERATING REAL AI TRANSCRIPTS ---
 if __name__ == "__main__":
     goals = [
-        "Manifesting $90k",
-        "Manifesting entrance into University of Washington Summer Semester",
-        "Manifesting extremely clean skin and a healthy body",
-        "Manifesting clean eating habits",
-        "Manifesting a transformative psychedelic experience"
+        "Manifesting $90k" # Focus on this goal for audio test
     ]
-    
-    # For review, a shorter duration is fine. The placeholder AI will adapt its themed content part.
-    duration_for_review = 10 
+    duration_for_scripts = 10 # Duration for the AI to aim for each script
 
-    print("===== GENERATING AI MEDITATION TRANSCRIPTS FOR REVIEW =====")
-    print("IMPORTANT: The following transcripts are SIMULATED via a placeholder function. ")
-    print("You will need to implement the actual calls to your zen-mcp-server ")
-    print("in the 'call_mcp_server_for_script_generation' function to use Gemini with your API key.\n")
+    print("===== GENERATING AUDIO FOR SELECTED AI MEDITATION SCRIPT =====")
+    if not GEMINI_API_KEY or GEMINI_API_KEY == "AIzaSyAqko3NqGS-GtXhzm8LeiZ3xUEyo_XIqLo": # Default key check
+        print("CRITICAL WARNING: A valid GEMINI_API_KEY is not configured. Script generation will likely fail or use a restricted key.")
+        print("Please set the GEMINI_API_KEY environment variable or update the hardcoded key in the script with a valid one.")
 
-    all_generated_content = {}
-
-    for goal in goals:
-        # create_audio_file is False, so this will only generate and print the simulated transcript
-        content = generate_complete_meditation(goal, duration_for_review, create_audio_file=False)
-        all_generated_content[goal] = content
-        if goal != goals[-1]:
-            print("\n" + "="*80 + "\n") 
-
-    print("\n\n===== SUMMARY OF SIMULATED AI-GENERATED TRANSCRIPTS (FIRST/LAST 5 LINES) =====")
-    for goal, transcript_text in all_generated_content.items():
-        print(f"\n--- Goal: {goal} ---")
-        if transcript_text and not transcript_text.startswith("[ERROR:"):
-            lines = transcript_text.split('\n')
-            if len(lines) > 10:
-                print("\n".join(lines[:5]))
-                print("[...] (Full transcript was printed above during its generation)")
-                print("\n".join(lines[-5:]))
-            else:
-                print(transcript_text)
-        elif transcript_text:
-             print(f"  Content: {transcript_text}") # Print error/info message
+    for goal in goals: # Loop will run once
+        # Set create_audio_file=True to generate the MP3
+        print(f"\n--- Generating audio for goal: '{goal}' ---")
+        generated_content = generate_complete_meditation(goal, duration_for_scripts, create_audio_file=True)
+        
+        if isinstance(generated_content, str) and generated_content.startswith("[ERROR:"):
+            print(f"Failed to generate content for '{goal}': {generated_content}")
+        elif isinstance(generated_content, str) and not generated_content.startswith("[ERROR:"):
+            # This case implies script was returned, but audio wasn't created (e.g. BG file missing, or other non-script error)
+            print(f"Script was generated for '{goal}', but audio file creation might have failed. Check messages above.")
+            print(f"Script content:\n{generated_content[:300]}...") # Print beginning of script
+        elif generated_content: # Should be the MP3 path if successful
+            print(f"Successfully generated MP3 for '{goal}': {generated_content}")
         else:
-            print("  [No transcript or unexpected error during generation]")
-        print("-"*(len(goal) + 12) + "\n")
+            print(f"An unexpected issue occurred for '{goal}'. No content generated.")
+        print("\n" + "="*80 + "\n")
 
-    print("\nReview the full console output above for the complete simulated transcripts.")
-    print("Next steps:")
-    print("1. Implement the actual HTTP request to your zen-mcp-server in the 'call_mcp_server_for_script_generation' function.")
-    print("2. Ensure your zen-mcp-server is running and correctly configured with your Gemini API key.")
-    print("3. Once the MCP call is implemented, run this script again to get REAL AI-generated transcripts.")
-    print("4. Evaluate the quality of the real AI transcripts. If good, you can set create_audio_file=True to generate MP3s.")
+    print("\nAudio generation test complete.")
+    # The summary part is removed as we are focusing on one audio generation.

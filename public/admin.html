@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hemi-gen Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .card h2 {
+            color: #2d3748;
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .status-good {
+            color: #38a169;
+        }
+
+        .status-warning {
+            color: #d69e2e;
+        }
+
+        .status-danger {
+            color: #e53e3e;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            transition: width 0.3s ease;
+        }
+
+        .progress-fill.warning {
+            background: linear-gradient(90deg, #ed8936, #d69e2e);
+        }
+
+        .progress-fill.danger {
+            background: linear-gradient(90deg, #f56565, #e53e3e);
+        }
+
+        .chart-container {
+            height: 200px;
+            margin-top: 16px;
+            display: flex;
+            align-items: end;
+            gap: 4px;
+            padding: 16px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(to top, #667eea, #764ba2);
+            min-height: 4px;
+            border-radius: 2px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .chart-bar:hover {
+            opacity: 0.8;
+        }
+
+        .loading {
+            text-align: center;
+            color: #718096;
+            padding: 40px;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #9b2c2c;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.2s ease;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .alert {
+            background: #fed7d7;
+            color: #9b2c2c;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border-left: 4px solid #e53e3e;
+        }
+
+        .timestamp {
+            color: #718096;
+            font-size: 0.8rem;
+            margin-top: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Hemi-gen Admin Dashboard</h1>
+            <p>Monitor usage, costs, and system health</p>
+            <button class="refresh-btn" onclick="refreshData()">🔄 Refresh Data</button>
+        </div>
+
+        <div id="alerts"></div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>📈 Usage Statistics</h2>
+                <div id="usageStats" class="loading">Loading...</div>
+            </div>
+
+            <div class="card">
+                <h2>💰 Cost Tracking</h2>
+                <div id="costStats" class="loading">Loading...</div>
+            </div>
+
+            <div class="card">
+                <h2>🚦 System Status</h2>
+                <div id="systemStatus" class="loading">Loading...</div>
+            </div>
+
+            <div class="card">
+                <h2>⚡ Health Check</h2>
+                <div id="healthCheck" class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📊 Daily Usage Chart</h2>
+            <div id="usageChart" class="chart-container">
+                <div class="loading">Loading chart...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class AdminDashboard {
+            constructor() {
+                this.refreshData();
+                // Auto-refresh every 30 seconds
+                setInterval(() => this.refreshData(), 30000);
+            }
+
+            async refreshData() {
+                try {
+                    await Promise.all([
+                        this.loadUsageStats(),
+                        this.loadSystemStatus(),
+                        this.loadHealthCheck(),
+                        this.loadAnalytics()
+                    ]);
+                } catch (error) {
+                    console.error('Dashboard refresh error:', error);
+                }
+            }
+
+            async loadUsageStats() {
+                try {
+                    const response = await fetch('/api/monitor?path=status');
+                    const data = await response.json();
+                    
+                    let html = '';
+                    
+                    if (data.daily_requests !== undefined) {
+                        const dailyPercent = (data.daily_requests / data.limits.daily_request_limit) * 100;
+                        const dailyClass = dailyPercent > 80 ? 'danger' : dailyPercent > 60 ? 'warning' : '';
+                        
+                        html += `
+                            <div class="metric">
+                                <span class="metric-label">Daily Requests</span>
+                                <span class="metric-value">${data.daily_requests} / ${data.limits.daily_request_limit}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill ${dailyClass}" style="width: ${Math.min(dailyPercent, 100)}%"></div>
+                            </div>
+                        `;
+                        
+                        html += `
+                            <div class="metric">
+                                <span class="metric-label">Monthly Requests</span>
+                                <span class="metric-value">${data.monthly_requests}</span>
+                            </div>
+                        `;
+                    } else {
+                        html = '<div class="error">Monitoring not available</div>';
+                    }
+                    
+                    document.getElementById('usageStats').innerHTML = html;
+                } catch (error) {
+                    document.getElementById('usageStats').innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                }
+            }
+
+            async loadSystemStatus() {
+                try {
+                    const response = await fetch('/api/monitor?path=status');
+                    const data = await response.json();
+                    
+                    let html = '';
+                    
+                    if (data.monthly_cost !== undefined) {
+                        const costPercent = (data.monthly_cost / data.limits.monthly_cost_limit) * 100;
+                        const costClass = costPercent > 80 ? 'danger' : costPercent > 60 ? 'warning' : '';
+                        
+                        html += `
+                            <div class="metric">
+                                <span class="metric-label">Monthly Cost</span>
+                                <span class="metric-value">$${data.monthly_cost.toFixed(2)} / $${data.limits.monthly_cost_limit}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill ${costClass}" style="width: ${Math.min(costPercent, 100)}%"></div>
+                            </div>
+                        `;
+                        
+                        html += `
+                            <div class="metric">
+                                <span class="metric-label">Cost per Request</span>
+                                <span class="metric-value">$0.001</span>
+                            </div>
+                        `;
+                    }
+                    
+                    document.getElementById('costStats').innerHTML = html;
+                    
+                    // Show alerts
+                    let alertsHtml = '';
+                    if (data.warnings && data.warnings.length > 0) {
+                        data.warnings.forEach(warning => {
+                            alertsHtml += `<div class="alert">⚠️ ${warning}</div>`;
+                        });
+                    }
+                    
+                    if (data.blocked) {
+                        alertsHtml += `<div class="alert">🚫 Service blocked due to limits</div>`;
+                    }
+                    
+                    document.getElementById('alerts').innerHTML = alertsHtml;
+                    
+                } catch (error) {
+                    document.getElementById('costStats').innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                }
+            }
+
+            async loadHealthCheck() {
+                try {
+                    const response = await fetch('/api/monitor?path=health');
+                    const data = await response.json();
+                    
+                    let html = '';
+                    
+                    html += `
+                        <div class="metric">
+                            <span class="metric-label">API Status</span>
+                            <span class="metric-value status-good">✅ Healthy</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Redis Connection</span>
+                            <span class="metric-value ${data.redis_connected ? 'status-good' : 'status-warning'}">
+                                ${data.redis_connected ? '✅ Connected' : '⚠️ Disconnected'}
+                            </span>
+                        </div>
+                        <div class="timestamp">Last check: ${new Date(data.timestamp).toLocaleString()}</div>
+                    `;
+                    
+                    document.getElementById('healthCheck').innerHTML = html;
+                } catch (error) {
+                    document.getElementById('healthCheck').innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                }
+            }
+
+            async loadAnalytics() {
+                try {
+                    const response = await fetch('/api/monitor?path=analytics');
+                    const data = await response.json();
+                    
+                    if (data.daily_usage) {
+                        const chartHtml = this.generateChart(data.daily_usage);
+                        document.getElementById('usageChart').innerHTML = chartHtml;
+                        
+                        let statsHtml = `
+                            <div class="metric">
+                                <span class="metric-label">Total Requests (7 days)</span>
+                                <span class="metric-value">${data.total_requests}</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Peak Day</span>
+                                <span class="metric-value">${data.peak_day || 'N/A'} (${data.peak_requests} requests)</span>
+                            </div>
+                        `;
+                        
+                        // Add to system status
+                        document.getElementById('systemStatus').innerHTML = statsHtml;
+                    }
+                } catch (error) {
+                    document.getElementById('usageChart').innerHTML = `<div class="error">Analytics error: ${error.message}</div>`;
+                }
+            }
+
+            generateChart(dailyUsage) {
+                const dates = Object.keys(dailyUsage).sort();
+                const maxRequests = Math.max(...Object.values(dailyUsage));
+                
+                if (maxRequests === 0) {
+                    return '<div class="loading">No usage data available</div>';
+                }
+                
+                let chartHtml = '';
+                dates.forEach(date => {
+                    const requests = dailyUsage[date];
+                    const height = (requests / maxRequests) * 100;
+                    const shortDate = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    
+                    chartHtml += `
+                        <div class="chart-bar" 
+                             style="height: ${height}%" 
+                             title="${shortDate}: ${requests} requests">
+                        </div>
+                    `;
+                });
+                
+                return chartHtml;
+            }
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            new AdminDashboard();
+        });
+
+        function refreshData() {
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
