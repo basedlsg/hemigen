@@ -5,13 +5,26 @@ import hashlib
 from datetime import datetime, timedelta
 import google.generativeai as genai
 from http.server import BaseHTTPRequestHandler
-import redis
 import traceback
 import re
 import io
 import base64
-from elevenlabs.client import ElevenLabs
-from pydub import AudioSegment
+
+# Try to import optional dependencies
+try:
+    import redis
+except ImportError:
+    redis = None
+
+try:
+    from elevenlabs.client import ElevenLabs
+    from pydub import AudioSegment
+    AUDIO_AVAILABLE = True
+except ImportError:
+    ElevenLabs = None
+    AudioSegment = None
+    AUDIO_AVAILABLE = False
+    print("Audio dependencies not available - text-only mode")
 
 # Initialize APIs
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
@@ -23,21 +36,22 @@ if GEMINI_API_KEY:
 
 # Initialize ElevenLabs
 elevenlabs_client = None
-if ELEVENLABS_API_KEY:
+if ELEVENLABS_API_KEY and AUDIO_AVAILABLE:
     try:
         elevenlabs_client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
+        print("ElevenLabs client initialized successfully")
     except Exception as e:
         print(f"ElevenLabs initialization failed: {e}")
 
 # Redis for rate limiting (Upstash free tier)
 REDIS_URL = os.environ.get('REDIS_URL')
 redis_client = None
-if REDIS_URL:
+if REDIS_URL and redis:
     try:
-        import redis
         redis_client = redis.from_url(REDIS_URL)
-    except:
-        pass
+        print("Redis client initialized successfully")
+    except Exception as e:
+        print(f"Redis initialization failed: {e}")
 
 # Enhanced meditation prompt optimized for production
 MEDITATION_PROMPT = """
@@ -198,8 +212,8 @@ def generate_meditation_script(scenario, duration):
 
 def synthesize_text_elevenlabs(text):
     """Synthesize text using ElevenLabs API."""
-    if not elevenlabs_client:
-        print("ElevenLabs client not initialized")
+    if not elevenlabs_client or not AUDIO_AVAILABLE:
+        print("ElevenLabs client not available")
         return None
     
     try:
@@ -213,10 +227,15 @@ def synthesize_text_elevenlabs(text):
         return full_audio_bytes
     except Exception as e:
         print(f"Error during ElevenLabs synthesis: {e}")
+        traceback.print_exc()
         return None
 
 def create_meditation_audio(script_text):
     """Create complete meditation audio with pauses."""
+    if not AUDIO_AVAILABLE:
+        print("Audio generation not available - missing dependencies")
+        return None
+        
     try:
         if not script_text:
             return None
@@ -317,50 +336,84 @@ class handler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps(response).encode())
                 return
             
-            # Generate audio
-            audio_data = create_meditation_audio(script)
+            # Try to generate audio
+            audio_data = None
+            audio_error = None
+            
+            try:
+                audio_data = create_meditation_audio(script)
+            except Exception as e:
+                audio_error = str(e)
+                print(f"Audio generation failed: {e}")
+                traceback.print_exc()
             
             if not audio_data:
                 # Fallback to text-only if audio generation fails
+                message = 'Meditation script generated!'
+                if audio_error:
+                    message += f' (Audio unavailable: {audio_error})'
+                elif not AUDIO_AVAILABLE:
+                    message += ' (Audio generation not supported in this environment)'
+                else:
+                    message += ' (Audio generation temporarily unavailable)'
+                    
                 response = {
                     'success': True,
                     'script': script,
                     'scenario': scenario,
                     'duration': duration,
                     'generated_at': datetime.now().isoformat(),
-                    'message': 'Meditation script generated! (Audio generation temporarily unavailable)',
+                    'message': message,
                     'audio_available': False
                 }
             else:
                 # Convert audio to base64 for transmission
-                audio_base64 = base64.b64encode(audio_data).decode('utf-8')
-                
-                response = {
-                    'success': True,
-                    'script': script,
-                    'audio_data': audio_base64,
-                    'scenario': scenario,
-                    'duration': duration,
-                    'generated_at': datetime.now().isoformat(),
-                    'message': 'Your personalized Hemi-Sync meditation with audio is ready!',
-                    'audio_available': True
-                }
+                try:
+                    audio_base64 = base64.b64encode(audio_data).decode('utf-8')
+                    
+                    response = {
+                        'success': True,
+                        'script': script,
+                        'audio_data': audio_base64,
+                        'scenario': scenario,
+                        'duration': duration,
+                        'generated_at': datetime.now().isoformat(),
+                        'message': 'Your personalized Hemi-Sync meditation with audio is ready!',
+                        'audio_available': True
+                    }
+                except Exception as e:
+                    print(f"Error encoding audio data: {e}")
+                    response = {
+                        'success': True,
+                        'script': script,
+                        'scenario': scenario,
+                        'duration': duration,
+                        'generated_at': datetime.now().isoformat(),
+                        'message': 'Meditation script generated! (Audio encoding failed)',
+                        'audio_available': False
+                    }
             
             self.wfile.write(json.dumps(response).encode())
             
         except Exception as e:
-            print(f"Handler error: {str(e)}")
+            error_msg = str(e)
+            print(f"Handler error: {error_msg}")
             traceback.print_exc()
             
-            self.send_response(500)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            
-            response = {
-                'error': 'Internal server error. Please try again.',
-                'code': 'INTERNAL_ERROR'
-            }
-            self.wfile.write(json.dumps(response).encode())
+            try:
+                self.send_response(500)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                
+                response = {
+                    'error': 'Internal server error. Please try again.',
+                    'code': 'INTERNAL_ERROR',
+                    'debug': error_msg if len(error_msg) < 100 else error_msg[:100] + '...'
+                }
+                self.wfile.write(json.dumps(response).encode())
+            except Exception as write_error:
+                print(f"Error writing error response: {write_error}")
     
     def do_OPTIONS(self):
         # Handle CORS preflight
