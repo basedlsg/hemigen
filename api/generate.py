@@ -290,8 +290,34 @@ def create_meditation_audio(script_text):
         return None
 
 class handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        """Handle GET requests for testing."""
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Content-Type', 'application/json')
+        self.end_headers()
+        
+        response = {
+            'status': 'API is running',
+            'method': 'GET',
+            'endpoints': {
+                'POST /api/generate': 'Generate meditation with audio',
+                'GET /api/generate': 'This status endpoint'
+            },
+            'environment': {
+                'gemini_available': bool(GEMINI_API_KEY),
+                'audio_available': AUDIO_AVAILABLE,
+                'elevenlabs_client': elevenlabs_client is not None
+            }
+        }
+        self.wfile.write(json.dumps(response, indent=2).encode())
+
     def do_POST(self):
         try:
+            print(f"=== API CALL RECEIVED ===")
+            print(f"Time: {datetime.now().isoformat()}")
+            print(f"Headers: {dict(self.headers)}")
+            
             # CORS headers
             self.send_response(200)
             self.send_header('Access-Control-Allow-Origin', '*')
@@ -302,7 +328,10 @@ class handler(BaseHTTPRequestHandler):
             
             # Rate limiting
             client_ip = get_client_ip(self)
+            print(f"Client IP: {client_ip}")
+            
             if not check_rate_limit(client_ip):
+                print("Rate limit exceeded")
                 response = {
                     'error': 'Rate limit exceeded. Please try again in 24 hours.',
                     'code': 'RATE_LIMIT_EXCEEDED'
@@ -315,8 +344,12 @@ class handler(BaseHTTPRequestHandler):
             post_data = self.rfile.read(content_length)
             data = json.loads(post_data.decode('utf-8'))
             
+            print(f"Request data: {data}")
+            
             scenario = data.get('scenario', '').strip()
             duration = int(data.get('duration', 25))
+            
+            print(f"Parsed - Scenario: '{scenario}', Duration: {duration}")
             
             # Validate input
             validation_error = validate_input(scenario, duration)
@@ -326,9 +359,12 @@ class handler(BaseHTTPRequestHandler):
                 return
             
             # Generate meditation script
+            print("Starting script generation...")
             script = generate_meditation_script(scenario, duration)
+            print(f"Script generated. Length: {len(script) if script else 0} characters")
             
             if not script:
+                print("Script generation failed")
                 response = {
                     'error': 'Unable to generate meditation. Please try again.',
                     'code': 'GENERATION_FAILED'
@@ -336,16 +372,26 @@ class handler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps(response).encode())
                 return
             
-            # Try to generate audio
+            # Try to generate audio (with timeout protection)
             audio_data = None
             audio_error = None
             
-            try:
-                audio_data = create_meditation_audio(script)
-            except Exception as e:
-                audio_error = str(e)
-                print(f"Audio generation failed: {e}")
-                traceback.print_exc()
+            print(f"Starting audio generation. AUDIO_AVAILABLE: {AUDIO_AVAILABLE}, elevenlabs_client: {elevenlabs_client is not None}")
+            
+            # Skip audio for now to test script generation
+            if False:  # Temporarily disable audio generation
+                try:
+                    start_time = time.time()
+                    audio_data = create_meditation_audio(script)
+                    generation_time = time.time() - start_time
+                    print(f"Audio generation took {generation_time:.2f} seconds")
+                except Exception as e:
+                    audio_error = str(e)
+                    print(f"Audio generation failed: {e}")
+                    traceback.print_exc()
+            else:
+                print("Audio generation skipped for testing")
+                audio_error = "Audio generation temporarily disabled for testing"
             
             if not audio_data:
                 # Fallback to text-only if audio generation fails
@@ -393,7 +439,14 @@ class handler(BaseHTTPRequestHandler):
                         'audio_available': False
                     }
             
-            self.wfile.write(json.dumps(response).encode())
+            print(f"Sending response. Audio available: {response.get('audio_available', False)}")
+            print(f"Response message: {response.get('message', 'No message')}")
+            
+            response_json = json.dumps(response)
+            print(f"Response size: {len(response_json)} characters")
+            
+            self.wfile.write(response_json.encode())
+            print("Response sent successfully")
             
         except Exception as e:
             error_msg = str(e)

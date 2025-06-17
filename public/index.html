@@ -794,7 +794,13 @@
                 this.resultSection.style.display = 'none';
                 this.setLoading(true);
 
+                console.log('🚀 Starting meditation generation...');
+                console.log('📝 Scenario:', scenario);
+                console.log('⏱️ Duration:', duration);
+
                 try {
+                    console.log('📡 Making API call to /api/generate');
+                    
                     const response = await fetch('/api/generate', {
                         method: 'POST',
                         headers: {
@@ -806,15 +812,24 @@
                         })
                     });
 
+                    console.log('📨 Response received:', {
+                        status: response.status,
+                        statusText: response.statusText,
+                        ok: response.ok
+                    });
+
                     const data = await response.json();
+                    console.log('📄 Response data:', data);
 
                     if (data.success) {
+                        console.log('✅ Success! Displaying result...');
                         this.displayResult(data);
                     } else {
+                        console.log('❌ API returned error:', data.error);
                         this.showError(data.error || 'Failed to generate meditation');
                     }
                 } catch (error) {
-                    console.error('Generation error:', error);
+                    console.error('💥 Generation error:', error);
                     this.showError('Network error. Please check your connection and try again.');
                 } finally {
                     this.setLoading(false);
@@ -822,6 +837,10 @@
             }
 
             displayResult(data) {
+                console.log('🎨 Displaying result...');
+                console.log('📋 Script length:', data.script ? data.script.length : 0);
+                console.log('🎵 Audio available:', data.audio_available);
+                
                 this.resultContent.textContent = data.script;
                 this.resultSection.style.display = 'block';
                 this.resultSection.scrollIntoView({ behavior: 'smooth' });
@@ -829,6 +848,8 @@
                 // Update download buttons container
                 const downloadContainer = document.querySelector('.download-buttons') || 
                     this.downloadBtn.parentElement;
+                    
+                console.log('📁 Download container found:', !!downloadContainer);
                 downloadContainer.innerHTML = '';
 
                 // Text download
