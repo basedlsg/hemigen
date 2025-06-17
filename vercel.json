@@ -1,11 +1,5 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/generate.py",
-      "use": "@vercel/python"
-    }
-  ],
   "rewrites": [
     {
       "source": "/(.*)",
@@ -14,8 +8,7 @@
   ],
   "functions": {
     "api/generate.py": {
-      "maxDuration": 300,
-      "runtime": "python3.9"
+      "maxDuration": 300
     }
   }
 }
