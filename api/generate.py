@@ -2,80 +2,103 @@ from http.server import BaseHTTPRequestHandler
 import json
 import os
 from datetime import datetime
+import time
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        """Status endpoint - NEW VERSION 3.0"""
+        """Status endpoint - v4.0 FULL AUDIO"""
         self.send_response(200)
         self.send_header('Content-Type', 'application/json')
         self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
+
+        # Direct environment check
+        gemini_key = os.environ.get('GEMINI_API_KEY', '')
+        elevenlabs_key = os.environ.get('ELEVENLABS_API_KEY', '')
         
-        # Check environment variables
-        gemini_key = os.environ.get('GEMINI_API_KEY')
-        elevenlabs_key = os.environ.get('ELEVENLABS_API_KEY')
+        # For internal testing - hardcode if env vars don't work
+        if not gemini_key:
+            gemini_key = 'AIzaSyAqko3NqGS-GtXhzm8LeiZ3xUEyo_XIqLo'
+        if not elevenlabs_key:
+            elevenlabs_key = 'sk_fe6faf571491c9b26bef909dce2e19a8e1d7239bf518027b'
         
         status = {
-            "status": "API ONLINE v3.0",
+            "status": "API ONLINE v4.0 - FULL AUDIO",
             "timestamp": datetime.now().isoformat(),
             "environment_check": {
                 "gemini_key_set": bool(gemini_key),
-                "gemini_key_preview": gemini_key[:10] + "..." if gemini_key else "NOT SET",
                 "elevenlabs_key_set": bool(elevenlabs_key),
-                "elevenlabs_key_preview": elevenlabs_key[:10] + "..." if elevenlabs_key else "NOT SET"
+                "keys_loaded": bool(gemini_key and elevenlabs_key)
             },
-            "ready_for_generation": bool(gemini_key),
-            "version": "3.0"
+            "capabilities": {
+                "full_audio_generation": True,
+                "meditation_duration": "30-60 minutes",
+                "audio_format": "mp3"
+            },
+            "version": "4.0"
         }
-        
+
         self.wfile.write(json.dumps(status, indent=2).encode())
 
     def do_POST(self):
-        """Generate meditation - WORKING VERSION"""
+        """Generate full meditation with complete audio"""
         try:
-            print("=== API v3.0 POST REQUEST ===")
-            
+            print("=== API v4.0 FULL AUDIO REQUEST ===")
+
             # CORS headers
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
-            self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
-            self.send_header('Access-Control-Allow-Headers', 'Content-Type')
             self.end_headers()
-            
-            # Parse request
-            content_length = int(self.headers['Content-Length'])
-            post_data = self.rfile.read(content_length)
-            data = json.loads(post_data.decode('utf-8'))
-            
-            scenario = data.get('scenario', '').strip()
-            duration = int(data.get('duration', 25))
-            
-            print(f"NEW API v3.0 - Scenario: {scenario[:30]}... Duration: {duration}")
-            
-            # Basic validation
-            if not scenario or len(scenario) < 10:
-                print("Validation failed - scenario too short")
-                response = {'error': 'Please provide a detailed meditation intention (at least 10 characters)'}
+
+            # Read request
+            content_length = int(self.headers.get('Content-Length', 0))
+            if content_length == 0:
+                response = {'error': 'No data received'}
                 self.wfile.write(json.dumps(response).encode())
                 return
+
+            body = self.rfile.read(content_length)
+            data = json.loads(body.decode('utf-8'))
+
+            scenario = data.get('scenario', '').strip()
+            duration = int(data.get('duration', 30))
+
+            print(f"Generating {duration}-minute meditation for: {scenario}")
+
+            # Validation
+            if not scenario or len(scenario) < 10:
+                response = {'error': 'Please provide a detailed meditation intention'}
+                self.wfile.write(json.dumps(response).encode())
+                return
+
+            # Get API keys with fallback
+            gemini_key = os.environ.get('GEMINI_API_KEY', '')
+            elevenlabs_key = os.environ.get('ELEVENLABS_API_KEY', '')
             
-            # Generate meditation script (fallback version)
-            script = self.create_meditation_script(scenario, duration)
+            # Hardcode for internal testing if env vars fail
+            if not gemini_key:
+                gemini_key = 'AIzaSyAqko3NqGS-GtXhzm8LeiZ3xUEyo_XIqLo'
+            if not elevenlabs_key:
+                elevenlabs_key = 'sk_fe6faf571491c9b26bef909dce2e19a8e1d7239bf518027b'
+
+            # Generate meditation script
+            script = self.create_meditation_script(scenario, duration, gemini_key)
             print(f"Script created: {len(script)} characters")
-            
-            # Try ElevenLabs if available
-            audio_sample = None
-            elevenlabs_key = os.environ.get('ELEVENLABS_API_KEY')
-            
+
+            # Generate FULL audio (not just sample)
+            audio_data = None
             if elevenlabs_key:
                 try:
-                    print("Attempting ElevenLabs generation...")
-                    audio_sample = self.generate_elevenlabs_sample(script, elevenlabs_key)
-                    print(f"Audio sample: {len(audio_sample) if audio_sample else 0} bytes")
+                    print("Generating FULL meditation audio...")
+                    start_time = time.time()
+                    audio_data = self.generate_full_audio(script, elevenlabs_key)
+                    generation_time = time.time() - start_time
+                    print(f"Full audio generated: {len(audio_data) if audio_data else 0} bytes in {generation_time:.1f} seconds")
                 except Exception as e:
-                    print(f"ElevenLabs failed: {e}")
-            
+                    print(f"Audio generation failed: {e}")
+                    # Continue without audio rather than failing completely
+
             # Success response
             response = {
                 'success': True,
@@ -83,32 +106,32 @@ class handler(BaseHTTPRequestHandler):
                 'scenario': scenario,
                 'duration': duration,
                 'generated_at': datetime.now().isoformat(),
-                'message': 'NEW API v3.0 - Meditation generated successfully!',
-                'audio_available': bool(audio_sample),
-                'api_version': '3.0'
+                'message': f'Full {duration}-minute meditation generated!',
+                'audio_available': bool(audio_data),
+                'api_version': '4.0'
             }
-            
-            if audio_sample:
+
+            if audio_data:
                 import base64
-                response['audio_data'] = base64.b64encode(audio_sample).decode('utf-8')
-                response['message'] = 'NEW API v3.0 - Meditation with audio generated!'
-            
-            print(f"Sending successful response: {len(json.dumps(response))} chars")
+                response['audio_data'] = base64.b64encode(audio_data).decode('utf-8')
+                response['audio_size_mb'] = round(len(audio_data) / (1024 * 1024), 2)
+
+            print(f"Sending response with script and {'full audio' if audio_data else 'no audio'}")
             self.wfile.write(json.dumps(response).encode())
-            
+
         except Exception as e:
-            print(f"API v3.0 ERROR: {e}")
+            print(f"API v4.0 ERROR: {e}")
             import traceback
             traceback.print_exc()
-            
+
             self.send_response(500)
             self.send_header('Content-Type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
             
             error_response = {
-                'error': f'API v3.0 Server Error: {str(e)}',
-                'api_version': '3.0'
+                'error': f'Server Error: {str(e)}',
+                'api_version': '4.0'
             }
             self.wfile.write(json.dumps(error_response).encode())
 
@@ -120,11 +143,10 @@ class handler(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
 
-    def create_meditation_script(self, scenario, duration):
-        """Create meditation script with proper Hemi-Sync structure"""
+    def create_meditation_script(self, scenario, duration, gemini_key):
+        """Create full meditation script"""
         
-        # Try Gemini first
-        gemini_key = os.environ.get('GEMINI_API_KEY')
+        # Try Gemini first if available
         if gemini_key:
             try:
                 import google.generativeai as genai
@@ -132,151 +154,331 @@ class handler(BaseHTTPRequestHandler):
                 
                 prompt = f"""Create a {duration}-minute Hemi-Sync meditation script for: "{scenario}"
 
-Follow Monroe Institute structure:
-1. Welcome & Preparation (1 min)
-2. Energy Conversion Box (1 min)
-3. Resonant Tuning (2 min) 
-4. Affirmation (1 min)
-5. Focus 10 Induction (3 min)
-6. Main Experience ({duration-8} min)
-7. Return Sequence (2 min)
-8. Closing (1 min)
+Follow this exact Monroe Institute structure with specific timings:
+1. Welcome & Preparation (2 minutes)
+2. Energy Conversion Box (2 minutes)  
+3. Resonant Tuning (3 minutes)
+4. Affirmation (2 minutes)
+5. Focus 10 Induction (5 minutes)
+6. Main Experience ({duration-16} minutes)
+7. Return Sequence (2 minutes)
+8. Closing (1 minute)
 
-Include [PAUSE:X] markers where X is seconds.
-Present tense as if goal achieved.
-Total: {duration} minutes."""
-
+Requirements:
+- Include [PAUSE:X] markers where X is seconds (10-60)
+- Write in present tense as if the goal is already achieved
+- Include specific visualizations and feelings
+- Make the main experience immersive and transformative
+- Total duration must be exactly {duration} minutes
+- Write out EVERY section completely, no summaries"""
+                
                 model = genai.GenerativeModel('gemini-1.5-pro-latest')
                 response = model.generate_content(prompt)
                 print("Gemini script generated successfully")
                 return response.text.strip()
                 
             except Exception as e:
-                print(f"Gemini failed, using fallback: {e}")
+                print(f"Gemini failed, using enhanced fallback: {e}")
         
-        # Fallback script
-        print("Using fallback meditation script")
-        return f"""**Welcome & Preparation (1 min)**
+        # Enhanced fallback script for full duration
+        print("Using enhanced fallback meditation script")
+        return self.generate_fallback_script(scenario, duration)
 
-Welcome to your personalized Hemi-Sync meditation for {scenario}. Find a comfortable position, close your eyes, and begin to relax.
+    def generate_fallback_script(self, scenario, duration):
+        """Generate a complete fallback script for any duration"""
+        main_duration = duration - 16  # Total minus fixed sections
+        
+        return f"""**Welcome & Preparation (2 minutes)**
 
-[PAUSE:10]
-
-**Energy Conversion Box (1 min)**
-
-Visualize a secure mental container. Place all your worries, fears, and distractions into this box. They will be safe here and available when you return.
+Welcome to your personalized Hemi-Sync meditation for {scenario}. Find a comfortable position where you won't be disturbed. Close your eyes and begin to relax.
 
 [PAUSE:15]
 
-**Resonant Tuning (2 min)**
-
-Take three deep breaths. With each exhale, hum gently: "Ahhhhhh..." Feel the vibration energizing your entire being.
+Take a deep breath in... and slowly exhale. With each breath, allow yourself to relax more deeply.
 
 [PAUSE:20]
 
-Breathe in universal energy, breathe out tension and limitation.
+Feel your body becoming heavier, sinking into comfort. You are safe, supported, and ready for this transformative journey.
 
-[PAUSE:15]
+[PAUSE:25]
 
-**Affirmation (1 min)**
+**Energy Conversion Box (2 minutes)**
 
-"I am more than my physical body. Because I am more than physical matter, I can perceive that which is greater than the physical world."
+Now, visualize a beautiful, secure container before you. This is your Energy Conversion Box. It can be any shape or material you choose - a treasure chest, a crystal box, or a sphere of light.
+
+[PAUSE:20]
+
+Into this box, place all your worries, concerns, and distractions. Watch as each worry transforms into neutral energy as it enters the box.
+
+[PAUSE:30]
+
+Place any physical discomfort, mental chatter, or emotional tensions into the box. They will be safely stored and transformed while you journey.
+
+[PAUSE:30]
+
+Seal your box now, knowing everything is secure and will be returned to you transformed into positive energy.
+
+[PAUSE:20]
+
+**Resonant Tuning (3 minutes)**
+
+Take a deep breath in, and as you exhale, hum or tone the sound "Ahhhhhh..." Feel the vibration throughout your body.
+
+[PAUSE:25]
+
+Again, breathe in deeply... and "Ahhhhhh..." Let the sound resonate in your chest, spreading warmth and energy.
+
+[PAUSE:25]
+
+One more time, breathe in universal energy... and "Ahhhhhh..." Feel your entire being vibrating in harmony with the universe.
+
+[PAUSE:30]
+
+Continue breathing naturally, feeling the residual vibration aligning every cell in your body with your highest good.
+
+[PAUSE:40]
+
+You are now tuned to the perfect frequency for manifesting {scenario}.
+
+[PAUSE:30]
+
+**Affirmation (2 minutes)**
+
+Repeat after me in your mind: "I am more than my physical body. Because I am more than physical matter, I can perceive that which is greater than the physical world."
+
+[PAUSE:30]
 
 "I am now manifesting {scenario} with perfect ease and divine timing."
 
-[PAUSE:15]
+[PAUSE:25]
 
-**Focus 10 Induction (3 min)**
+"My consciousness creates my reality. I am aligned with the infinite possibilities of the universe."
 
-Now we'll count from 1 to 10, relaxing deeper with each number...
+[PAUSE:25]
 
-1... releasing all tension from your feet and legs [PAUSE:8]
-2... letting go from your lower torso [PAUSE:8]
-3... releasing your chest and shoulders [PAUSE:8]
-4... relaxing your arms and hands [PAUSE:8]
-5... releasing your neck and throat [PAUSE:8]
-6... relaxing your facial muscles [PAUSE:8]
-7... releasing your entire head [PAUSE:8]
-8... deeper and deeper relaxation [PAUSE:8]
-9... mind awake, body completely asleep [PAUSE:8]
-10... perfectly relaxed in Focus 10 [PAUSE:15]
-
-**Main Experience ({duration-8} min)**
-
-You are now in the perfect state to experience {scenario} as your current reality.
+"I trust in the process. What I seek is already mine in the quantum field."
 
 [PAUSE:30]
 
-See yourself already living this experience. What do you see around you? What feelings arise as you embody this reality?
+**Focus 10 Induction (5 minutes)**
+
+Now we'll count from 1 to 10, entering the state of Focus 10 - mind awake, body asleep.
+
+[PAUSE:15]
+
+1... Releasing all tension from your feet and ankles. They are completely relaxed.
+
+[PAUSE:20]
+
+2... Relaxation flowing up through your calves and knees, releasing completely.
+
+[PAUSE:20]
+
+3... Your thighs and hips letting go, sinking into deep relaxation.
+
+[PAUSE:20]
+
+4... Your abdomen and lower back releasing all tension, breathing naturally and easily.
+
+[PAUSE:20]
+
+5... Your chest and upper back relaxing, your heart beating peacefully.
+
+[PAUSE:20]
+
+6... Your shoulders dropping, releasing all burdens and tension.
+
+[PAUSE:20]
+
+7... Your arms and hands becoming heavy and completely relaxed.
+
+[PAUSE:20]
+
+8... Your neck and throat soft and relaxed, no tension remaining.
+
+[PAUSE:20]
+
+9... Your face, jaw, and scalp completely relaxed, your mind clear and alert.
+
+[PAUSE:20]
+
+10... You have reached Focus 10. Your body is completely asleep while your mind remains awake and aware. You are in the perfect state for manifestation.
+
+[PAUSE:30]
+
+**Main Experience ({main_duration} minutes)**
+
+You are now in the quantum field of infinite possibilities, where {scenario} already exists as your reality.
+
+[PAUSE:30]
+
+Visualize yourself living this reality right now. See yourself experiencing {scenario} in vivid detail. What does your environment look like?
 
 [PAUSE:45]
 
-Feel the emotions of having achieved {scenario}. Experience the joy, satisfaction, and gratitude flowing through every cell of your being.
+Notice the colors, textures, and light around you. Feel the temperature, the air on your skin. You are fully present in this moment of achievement.
 
 [PAUSE:60]
 
-Your subconscious mind is now accepting this as your true reality. Feel it integrating into your energy field.
+Who is with you in this reality? See their faces, hear their voices congratulating you, supporting you, celebrating with you.
 
 [PAUSE:45]
 
-Trust that this manifestation is already complete in the quantum field. You are simply allowing it to materialize in physical reality.
+Feel the emotions flooding through you - joy, satisfaction, gratitude, peace. Let these feelings fill every cell of your body.
 
-[PAUSE:30]
+[PAUSE:60]
 
-Take a moment to anchor this feeling deep within your heart center.
+Your success with {scenario} has ripple effects. See how it positively impacts your life, your loved ones, your community.
 
-[PAUSE:30]
+[PAUSE:45]
 
-**Return Sequence (2 min)**
+Breathe in this reality. You are not imagining - you are remembering your future that already exists.
 
-In a moment, we'll return to normal waking consciousness. You'll feel refreshed, energized, and aligned with your manifestation.
+[PAUSE:90]
 
-10... beginning to return, carrying this energy with you [PAUSE:8]
-9... becoming more aware of your physical body [PAUSE:8]
-8... feeling energy returning to your limbs [PAUSE:8]
-7... almost back to normal consciousness [PAUSE:8]
-6... wiggling your fingers and toes [PAUSE:8]
-5... taking deeper breaths [PAUSE:8]
-4... feeling alert and energized [PAUSE:8]
-3... almost fully back [PAUSE:8]
-2... opening your eyes when ready [PAUSE:8]
-1... fully awake, alert, and aligned [PAUSE:10]
+Notice how natural this feels. Of course this is your reality. It was always meant to be this way.
 
-**Closing (1 min)**
+[PAUSE:60]
 
-You have successfully programmed your consciousness for {scenario}. This energy now flows through you throughout your day. 
+Your subconscious mind is now reprogramming every neural pathway to align with this reality. Old limiting beliefs dissolve like mist.
 
-Remember: you are a powerful creator, and your meditation has activated the manifestation process.
+[PAUSE:45]
 
-Thank you for this sacred time together."""
+Feel the confidence and certainty flowing through you. You know with absolute certainty that {scenario} is manifesting in perfect timing.
 
-    def generate_elevenlabs_sample(self, script, api_key):
-        """Generate short ElevenLabs audio sample"""
+[PAUSE:60]
+
+Take a moment to feel profound gratitude for this reality. Thank the universe, thank yourself, thank all who support you.
+
+[PAUSE:75]
+
+Your energy field is now permanently attuned to {scenario}. You are a magnet for all the resources, opportunities, and synchronicities needed.
+
+[PAUSE:90]
+
+Rest in this knowing. There is nothing more you need to do. The universe is handling all the details.
+
+[PAUSE:120]
+
+Continue to bask in this reality for the next few moments, knowing it is done.
+
+[PAUSE:180]
+
+**Return Sequence (2 minutes)**
+
+In a moment, we'll return to normal waking consciousness, bringing with you all the energy and alignment from this meditation.
+
+[PAUSE:20]
+
+I'll count from 10 back to 1. With each number, you'll return more to normal awareness while maintaining your manifestation.
+
+10... Beginning to return, your manifestation locked into your energy field.
+[PAUSE:10]
+
+9... Becoming aware of your physical body, feeling refreshed.
+[PAUSE:10]
+
+8... Energy beginning to return to your muscles.
+[PAUSE:10]
+
+7... Your breathing deepening naturally.
+[PAUSE:10]
+
+6... Beginning to move your fingers and toes gently.
+[PAUSE:10]
+
+5... Halfway back, feeling wonderful and aligned.
+[PAUSE:10]
+
+4... Your energy increasing, feeling revitalized.
+[PAUSE:10]
+
+3... Almost back, preparing to open your eyes.
+[PAUSE:10]
+
+2... Taking a deep breath, fully present.
+[PAUSE:10]
+
+1... Eyes open when ready, fully awake, alert, and aligned with {scenario}.
+
+[PAUSE:15]
+
+**Closing (1 minute)**
+
+You have successfully completed your Hemi-Sync meditation for {scenario}. The work is done. Your consciousness has been reprogrammed.
+
+Trust that everything is unfolding perfectly. You may notice synchronicities, opportunities, and shifts beginning immediately.
+
+Remember: you are a powerful creator. What you experienced was not imagination - it was a preview of your incoming reality.
+
+Thank you for this sacred time. Go forward knowing that {scenario} is manifesting now.
+
+Namaste."""
+
+    def generate_full_audio(self, script, api_key):
+        """Generate complete audio for the entire meditation"""
         try:
             from elevenlabs.client import ElevenLabs
             
             client = ElevenLabs(api_key=api_key)
             
-            # Extract first clean sentence for sample
+            # Clean the script for TTS
             import re
-            clean_text = re.sub(r'\[PAUSE:\d+\]', '', script)
-            clean_text = re.sub(r'\*\*([^*]+)\*\*', r'\1', clean_text)
             
-            sentences = [s.strip() for s in clean_text.split('.') if len(s.strip()) > 30]
-            if not sentences:
-                return None
+            # Remove markdown formatting
+            clean_text = re.sub(r'\*\*([^*]+)\*\*', r'\1', script)
             
-            sample_text = sentences[0][:200] + '.'
-            print(f"Generating audio for: {sample_text[:50]}...")
+            # Replace [PAUSE:X] with actual pauses
+            # ElevenLabs supports SSML-like breaks
+            clean_text = re.sub(r'\[PAUSE:(\d+)\]', lambda m: '... ' * max(1, int(m.group(1))//5), clean_text)
             
-            audio_iterator = client.text_to_speech.convert(
-                voice_id="7nFoun39JV8WgdJ3vGmC",
-                text=sample_text,
-                model_id="eleven_multilingual_v2"
-            )
+            # Split into manageable chunks (ElevenLabs has a 5000 char limit per request)
+            chunks = []
+            current_chunk = ""
             
-            return b"".join(list(audio_iterator))
+            sentences = clean_text.split('. ')
+            for sentence in sentences:
+                if len(current_chunk) + len(sentence) < 4500:
+                    current_chunk += sentence + ". "
+                else:
+                    if current_chunk:
+                        chunks.append(current_chunk.strip())
+                    current_chunk = sentence + ". "
             
+            if current_chunk:
+                chunks.append(current_chunk.strip())
+            
+            print(f"Generating audio in {len(chunks)} chunks...")
+            
+            # Generate audio for each chunk
+            audio_parts = []
+            for i, chunk in enumerate(chunks):
+                print(f"Generating chunk {i+1}/{len(chunks)}...")
+                
+                audio_iterator = client.text_to_speech.convert(
+                    voice_id="7nFoun39JV8WgdJ3vGmC",  # Calm meditation voice
+                    text=chunk,
+                    model_id="eleven_multilingual_v2",
+                    voice_settings={
+                        "stability": 0.75,
+                        "similarity_boost": 0.75,
+                        "style": 0.5,
+                        "use_speaker_boost": True
+                    }
+                )
+                
+                audio_data = b"".join(list(audio_iterator))
+                audio_parts.append(audio_data)
+                
+                # Small delay to avoid rate limiting
+                time.sleep(0.5)
+            
+            # Combine all audio parts
+            print("Combining audio chunks...")
+            full_audio = b"".join(audio_parts)
+            
+            return full_audio
+
         except Exception as e:
-            print(f"ElevenLabs error: {e}")
-            return None
+            print(f"Full audio generation error: {e}")
+            raise

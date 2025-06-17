@@ -1,9 +1,21 @@
 {
   "version": 2,
+  "builds": [
+    {
+      "src": "api/generate.py",
+      "use": "@vercel/python"
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
       "destination": "/public/index.html"
     }
-  ]
+  ],
+  "functions": {
+    "api/generate.py": {
+      "maxDuration": 300,
+      "runtime": "python3.9"
+    }
+  }
 }
