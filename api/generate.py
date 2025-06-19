@@ -24,8 +24,9 @@ class handler(BaseHTTPRequestHandler):
             elevenlabs_key = 'sk_fe6faf571491c9b26bef909dce2e19a8e1d7239bf518027b'
         
         status = {
-            "status": "API ONLINE v4.0 - FULL AUDIO",
+            "status": "API ONLINE v4.0 - FULL AUDIO - ENHANCED DEBUG",
             "timestamp": datetime.now().isoformat(),
+            "deployment_timestamp": "2024-06-19-FORCE-REBUILD",
             "environment_check": {
                 "gemini_key_set": bool(gemini_key),
                 "elevenlabs_key_set": bool(elevenlabs_key),
@@ -133,7 +134,9 @@ class handler(BaseHTTPRequestHandler):
                 'generated_at': datetime.now().isoformat(),
                 'message': f'Full {duration}-minute meditation generated!',
                 'audio_available': bool(audio_data),
-                'api_version': '4.0'
+                'api_version': '4.0',
+                'deployment_id': 'ENHANCED-DEBUG-2024-06-19',
+                'elevenlabs_version': '2.3.0'
             }
 
             if audio_data:
