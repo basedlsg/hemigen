@@ -11,7 +11,7 @@ if __name__ == "__main__":
     print("🎵 Background: READY")
     
     # Import the SIMPLE working version
-    from working_meditation import app
+    from simple_meditation_generator import app
     
     # Run it
     app.run(
