@@ -298,19 +298,43 @@ Monroe Institute Hemi-Sync Protocol Complete
     return script
 
 def generate_proper_meditation_audio(script):
-    """Generate meditation with REAL pauses and background audio"""
+    """Generate meditation with REAL pauses and Monroe Institute background"""
     try:
-        print("🎵 GENERATING PROPER MEDITATION AUDIO...")
+        print("🎵 GENERATING MEDITATION WITH MONROE INSTITUTE BACKGROUND...")
         
         from elevenlabs.client import ElevenLabs
         client = ElevenLabs(api_key='sk_fe6faf571491c9b26bef909dce2e19a8e1d7239bf518027b')
+        
+        # LOAD MONROE INSTITUTE BACKGROUND AUDIO
+        monroe_paths = [
+            os.path.join(os.path.dirname(__file__), 'assets', 'audio', 'monroe_background.mp3'),
+            "/Users/carlos/Focus-Creation/Focus-Creation/background_audio/y2mate.is - Robert Monroe Institute Astral Projection Gateway Process 40 minutes no talking -edB7QI8I02c-192k-1700669353.mp3",
+            "/Users/carlos/Focus-Creation/assets/audio/monroe_background.mp3"
+        ]
+        
+        monroe_background = None
+        for path in monroe_paths:
+            if os.path.exists(path):
+                print(f"🎛️ FOUND MONROE INSTITUTE BACKGROUND: {path}")
+                with open(path, 'rb') as f:
+                    monroe_background = f.read()
+                print(f"✅ Monroe Institute loaded: {len(monroe_background)} bytes ({len(monroe_background)/1024/1024:.1f} MB)")
+                break
+        
+        if not monroe_background:
+            print("❌ CRITICAL: Monroe Institute background NOT FOUND!")
+            print("🔍 Searched paths:")
+            for path in monroe_paths:
+                print(f"   - {path}")
+            return None
         
         # Parse script into speech and pause segments
         segments = parse_script_segments(script)
         print(f"📋 Parsed {len(segments)} segments")
         
-        # Generate each segment
-        audio_parts = []
+        # Generate spoken meditation
+        print("🎙️ Generating spoken meditation track...")
+        spoken_parts = []
         total_duration = 0
         
         for i, segment in enumerate(segments):
@@ -330,7 +354,7 @@ def generate_proper_meditation_audio(script):
                 )
                 
                 speech_audio = b"".join(list(audio_iterator))
-                audio_parts.append(speech_audio)
+                spoken_parts.append(('speech', speech_audio))
                 
                 # Estimate duration
                 word_count = len(segment['content'].split())
@@ -340,29 +364,73 @@ def generate_proper_meditation_audio(script):
                 print(f"  🎙️ Speech: {len(speech_audio)} bytes (~{speech_duration:.1f}s)")
                 
             elif segment['type'] == 'pause':
-                # Generate REAL silence
+                # Add pause timing
                 pause_duration = segment['duration']
-                
-                # Create proper silence audio
-                silence_audio = create_silence_audio(pause_duration)
-                audio_parts.append(silence_audio)
+                spoken_parts.append(('pause', pause_duration))
                 total_duration += pause_duration
                 
-                print(f"  🔇 Silence: {pause_duration}s ({len(silence_audio)} bytes)")
+                print(f"  🔇 Pause: {pause_duration}s")
             
             time.sleep(0.3)  # Rate limiting
         
-        # Combine all parts
-        print(f"🔗 Combining {len(audio_parts)} audio segments...")
-        final_audio = b"".join(audio_parts)
+        # NOW COMBINE WITH MONROE INSTITUTE BACKGROUND
+        print(f"🎛️ MIXING WITH MONROE INSTITUTE BACKGROUND...")
         
-        print(f"✅ MEDITATION COMPLETE!")
-        print(f"📊 Size: {len(final_audio)} bytes ({len(final_audio)/1024/1024:.2f} MB)")
-        print(f"⏱️ Duration: ~{total_duration/60:.1f} minutes")
-        print(f"🎯 Monroe Institute structure: COMPLETE")
-        print(f"🔇 Real pauses: INCLUDED")
-        
-        return final_audio
+        try:
+            from pydub import AudioSegment
+            from io import BytesIO
+            
+            # Load Monroe Institute background
+            monroe_audio = AudioSegment.from_mp3(BytesIO(monroe_background))
+            print(f"🎵 Monroe Institute background: {len(monroe_audio)/1000:.1f} seconds")
+            
+            # Reduce background volume for meditation
+            monroe_audio = monroe_audio - 12  # Reduce by 12dB for background
+            
+            # Create spoken track
+            spoken_track = AudioSegment.empty()
+            for part_type, part_data in spoken_parts:
+                if part_type == 'speech':
+                    speech_segment = AudioSegment.from_mp3(BytesIO(part_data))
+                    spoken_track += speech_segment
+                elif part_type == 'pause':
+                    pause_ms = part_data * 1000
+                    silence = AudioSegment.silent(duration=pause_ms)
+                    spoken_track += silence
+            
+            # Ensure Monroe background covers full meditation
+            spoken_duration = len(spoken_track)
+            if spoken_duration > len(monroe_audio):
+                # Loop Monroe background
+                loops = (spoken_duration // len(monroe_audio)) + 1
+                monroe_audio = monroe_audio * loops
+            
+            # Trim to match spoken duration
+            monroe_audio = monroe_audio[:spoken_duration]
+            
+            # MIX SPOKEN MEDITATION WITH MONROE BACKGROUND
+            print("🎛️ MIXING SPOKEN MEDITATION WITH MONROE INSTITUTE BACKGROUND...")
+            final_meditation = monroe_audio.overlay(spoken_track)
+            
+            # Export to bytes
+            output_buffer = BytesIO()
+            final_meditation.export(output_buffer, format="mp3", bitrate="192k")
+            final_audio = output_buffer.getvalue()
+            
+            print(f"✅ COMPLETE MONROE INSTITUTE MEDITATION!")
+            print(f"📊 Final size: {len(final_audio)} bytes ({len(final_audio)/1024/1024:.2f} MB)")
+            print(f"⏱️ Duration: ~{len(final_meditation)/1000/60:.1f} minutes")
+            print(f"🎛️ Monroe Institute background: ACTIVE")
+            print(f"🎙️ Spoken guidance: LAYERED")
+            print(f"🔇 Real pauses: INCLUDED")
+            
+            return final_audio
+            
+        except ImportError:
+            print("❌ pydub not available - cannot mix with Monroe Institute background")
+            # Fallback to spoken only
+            spoken_audio = b"".join([part[1] for part in spoken_parts if part[0] == 'speech'])
+            return spoken_audio
         
     except Exception as e:
         print(f"❌ Audio generation failed: {e}")
@@ -414,13 +482,40 @@ def parse_script_segments(script):
     return segments
 
 def create_silence_audio(duration_seconds):
-    """Create proper silence audio for pauses"""
-    # Generate PCM silence then encode as basic audio
-    # Rough calculation for compressed audio silence
-    sample_rate = 22050  # Lower sample rate for meditation
-    samples_per_second = sample_rate // 10  # Rough compression estimate
-    silence_bytes = b'\x00' * (duration_seconds * samples_per_second)
-    return silence_bytes
+    """Create PROPER audio silence that actually plays as silence"""
+    try:
+        # Use ElevenLabs to generate actual silence by converting minimal text
+        from elevenlabs.client import ElevenLabs
+        client = ElevenLabs(api_key='sk_fe6faf571491c9b26bef909dce2e19a8e1d7239bf518027b')
+        
+        # Generate very quiet/minimal speech that acts as silence
+        silence_text = "." * max(1, duration_seconds // 10)  # Minimal dots for timing
+        
+        audio_iterator = client.text_to_speech.convert(
+            voice_id="7nFoun39JV8WgdJ3vGmC",
+            text=silence_text,
+            model_id="eleven_multilingual_v2",
+            voice_settings={
+                "stability": 1.0,
+                "similarity_boost": 0.0,  # Minimize voice characteristics
+                "style": 0.0,
+                "use_speaker_boost": False
+            }
+        )
+        
+        silence_audio = b"".join(list(audio_iterator))
+        
+        # For longer pauses, repeat the base silence
+        if duration_seconds > 10:
+            repeats = duration_seconds // 10
+            silence_audio = silence_audio * repeats
+        
+        return silence_audio
+        
+    except:
+        # Fallback: create null bytes (won't play properly but won't crash)
+        print(f"⚠️ Couldn't generate proper silence for {duration_seconds}s - using fallback")
+        return b'\x00' * (duration_seconds * 1000)  # Basic fallback
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
