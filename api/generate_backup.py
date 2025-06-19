@@ -92,26 +92,12 @@ class handler(BaseHTTPRequestHandler):
             if elevenlabs_key:
                 try:
                     print("Generating FULL meditation audio...")
-                    print(f"ElevenLabs API key present: {bool(elevenlabs_key)}")
-                    print(f"Script length: {len(script)} characters")
-                    
                     start_time = time.time()
-                    
-                    # Add timeout check - Vercel has 5 minute limit
-                    max_audio_time = 240  # 4 minutes max for audio generation
-                    
                     audio_data = self.generate_full_audio(script, elevenlabs_key)
                     generation_time = time.time() - start_time
-                    
-                    if generation_time > max_audio_time:
-                        print(f"WARNING: Audio generation took {generation_time:.1f}s, may timeout on Vercel")
-                    
                     print(f"Full audio generated: {len(audio_data) if audio_data else 0} bytes in {generation_time:.1f} seconds")
                 except Exception as e:
                     print(f"Audio generation failed: {e}")
-                    import traceback
-                    print("Full traceback:")
-                    traceback.print_exc()
                     # Continue without audio rather than failing completely
 
             # Success response
@@ -433,13 +419,9 @@ Namaste."""
     def generate_full_audio(self, script, api_key):
         """Generate complete audio for the entire meditation"""
         try:
-            print(f"Attempting to import ElevenLabs...")
             from elevenlabs.client import ElevenLabs
-            print("ElevenLabs imported successfully")
             
-            print(f"Initializing ElevenLabs client with API key length: {len(api_key)}")
             client = ElevenLabs(api_key=api_key)
-            print("ElevenLabs client initialized")
             
             # Clean the script for TTS
             import re
@@ -472,28 +454,22 @@ Namaste."""
             # Generate audio for each chunk
             audio_parts = []
             for i, chunk in enumerate(chunks):
-                print(f"Generating chunk {i+1}/{len(chunks)} ({len(chunk)} chars)...")
+                print(f"Generating chunk {i+1}/{len(chunks)}...")
                 
-                try:
-                    audio_iterator = client.text_to_speech.convert(
-                        voice_id="7nFoun39JV8WgdJ3vGmC",  # Calm meditation voice
-                        text=chunk,
-                        model_id="eleven_multilingual_v2",
-                        voice_settings={
-                            "stability": 0.75,
-                            "similarity_boost": 0.75,
-                            "style": 0.5,
-                            "use_speaker_boost": True
-                        }
-                    )
-                    
-                    audio_data = b"".join(list(audio_iterator))
-                    audio_parts.append(audio_data)
-                    print(f"  Chunk {i+1} generated: {len(audio_data)} bytes")
-                    
-                except Exception as chunk_error:
-                    print(f"  ERROR in chunk {i+1}: {chunk_error}")
-                    raise
+                audio_iterator = client.text_to_speech.convert(
+                    voice_id="7nFoun39JV8WgdJ3vGmC",  # Calm meditation voice
+                    text=chunk,
+                    model_id="eleven_multilingual_v2",
+                    voice_settings={
+                        "stability": 0.75,
+                        "similarity_boost": 0.75,
+                        "style": 0.5,
+                        "use_speaker_boost": True
+                    }
+                )
+                
+                audio_data = b"".join(list(audio_iterator))
+                audio_parts.append(audio_data)
                 
                 # Small delay to avoid rate limiting
                 time.sleep(0.5)
