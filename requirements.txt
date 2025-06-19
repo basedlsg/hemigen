@@ -1,7 +1,9 @@
-google-generativeai==0.3.2
+Flask==2.3.3
 elevenlabs==2.3.0
-requests==2.31.0
+google-generativeai==0.3.2
 httpx==0.28.1
 pydantic==2.11.5
 pydantic_core==2.33.2
 websockets==15.0.1
+requests==2.31.0
+gunicorn==21.2.0
