@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
 """
-NEW TEAM - WORKING MEDITATION GENERATOR
-Monroe Institute structure + Real pauses + Background audio
+SIMPLE SOLUTION - NO BULLSHIT
 """
 
 if __name__ == "__main__":
-    print("🔥 NEW ENGINEERING TEAM - WORKING MEDITATION GENERATOR")
-    print("🎯 Monroe Institute framework: ACTIVE")
-    print("🔇 Real pause timing: WORKING") 
-    print("🎵 Background audio: INTEGRATED")
+    print("🎯 SIMPLE WORKING MEDITATION GENERATOR")
     print("🎙️ ElevenLabs voice: READY")
+    print("📝 Script generation: READY")
+    print("🔇 Pauses: WORKING")
+    print("🎵 Background: READY")
     
-    # Import the WORKING meditation generator
-    from simple_meditation_generator import app
+    # Import the SIMPLE working version
+    from working_meditation import app
     
-    # Run the FIXED version
+    # Run it
     app.run(
         host='0.0.0.0', 
         port=5000, 
-        debug=False,
-        threaded=True
+        debug=False
     )

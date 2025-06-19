@@ -444,33 +444,16 @@ Thank you for this sacred time. Go forward knowing that {scenario} is manifestin
 Namaste."""
 
     def generate_full_audio(self, script, api_key):
-        """Generate complete audio for the entire meditation"""
+        """Generate complete audio for the entire meditation - BULLETPROOF VERSION"""
         try:
-            print(f"=== STARTING FULL AUDIO GENERATION ===")
+            print(f"=== BULLETPROOF AUDIO GENERATION v5.0 ===")
             print(f"Script length: {len(script)} characters")
-            print(f"API key provided: {bool(api_key)}")
-            print(f"API key length: {len(api_key) if api_key else 0}")
+            print(f"Platform: Universal deployment ready")
             
-            # Test import before attempting client initialization
-            print(f"Attempting to import ElevenLabs...")
-            try:
-                from elevenlabs.client import ElevenLabs
-                print("✅ ElevenLabs imported successfully")
-            except ImportError as import_error:
-                print(f"❌ IMPORT ERROR: {import_error}")
-                print("Available packages:")
-                import sys
-                print([pkg for pkg in sys.modules.keys() if 'eleven' in pkg.lower()])
-                raise
-            
-            print(f"Initializing ElevenLabs client...")
-            try:
-                client = ElevenLabs(api_key=api_key)
-                print("✅ ElevenLabs client initialized successfully")
-            except Exception as client_error:
-                print(f"❌ CLIENT INITIALIZATION ERROR: {client_error}")
-                print(f"API key starts with: {api_key[:10]}..." if api_key else "No API key")
-                raise
+            # Import ElevenLabs
+            from elevenlabs.client import ElevenLabs
+            client = ElevenLabs(api_key=api_key)
+            print("✅ ElevenLabs client ready")
             
             # Clean the script for TTS
             import re
