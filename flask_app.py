@@ -438,11 +438,17 @@ def generate_audio(script):
         alternative_path = "/Users/carlos/Focus-Creation/Focus-Creation/background_audio/y2mate.is - Robert Monroe Institute Astral Projection Gateway Process 40 minutes no talking -edB7QI8I02c-192k-1700669353.mp3"
         
         print("🎛️ Loading Monroe Institute Gateway Process background audio...")
+        print(f"🔍 Looking for background audio files...")
+        print(f"   Path 1: {background_audio_path}")
+        print(f"   Path 2: {alternative_path}")
+        
         background_audio_available = False
+        background_audio_raw = None
         
         # Try project assets first, then original location
         for path in [background_audio_path, alternative_path]:
             try:
+                print(f"🔍 Checking: {path}")
                 if os.path.exists(path):
                     print(f"📁 Found background audio at: {path}")
                     with open(path, 'rb') as f:
@@ -450,13 +456,16 @@ def generate_audio(script):
                     print(f"✅ Monroe Institute background loaded: {len(background_audio_raw)} bytes ({len(background_audio_raw)/1024/1024:.1f} MB)")
                     background_audio_available = True
                     break
+                else:
+                    print(f"❌ File not found: {path}")
             except Exception as bg_error:
                 print(f"⚠️ Could not load from {path}: {bg_error}")
                 continue
         
         if not background_audio_available:
-            print("📝 Monroe Institute background not available, continuing with spoken meditation only...")
-            background_audio_raw = None
+            print("⚠️ CRITICAL: Monroe Institute background not available!")
+            print("📝 This means no background audio will be included in the meditation")
+            print("🔧 TODO: Upload monroe_background.mp3 to Replit assets/audio/ folder")
         
         # Parse script into segments with pause information
         segments = parse_meditation_script(script)
@@ -591,19 +600,25 @@ def generate_audio(script):
         
         except ImportError:
             print("⚠️ pydub not available - using basic audio concatenation...")
-            # Fallback to basic concatenation
+            print("⚠️ This means NO background audio and NO proper pauses!")
+            print("🔧 Replit needs pydub to be installed properly")
+            
+            # Fallback to basic concatenation (NO PAUSES, NO BACKGROUND)
             final_audio_parts = []
             for part_type, part_data in spoken_audio_parts:
                 if part_type == 'speech':
                     final_audio_parts.append(part_data)
+                    print(f"   Added speech segment: {len(part_data)} bytes")
                 elif part_type == 'silence':
                     # Create silence bytes (rough approximation)
                     silence_duration = part_data  # seconds
                     silence_bytes = b'\x00' * (silence_duration * 64)  # Rough MP3 silence
                     final_audio_parts.append(silence_bytes)
+                    print(f"   Added {silence_duration}s silence: {len(silence_bytes)} bytes")
             
             full_audio = b"".join(final_audio_parts)
-            print(f"📝 Basic audio concatenation complete (no background mixing)")
+            print(f"📝 Basic audio concatenation complete (NO BACKGROUND AUDIO)")
+            print(f"⚠️ Missing: Monroe Institute background, proper audio mixing")
         
         except Exception as audio_error:
             print(f"⚠️ Audio mixing failed: {audio_error}")
