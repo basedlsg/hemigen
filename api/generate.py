@@ -91,9 +91,10 @@ class handler(BaseHTTPRequestHandler):
             audio_data = None
             if elevenlabs_key:
                 try:
-                    print("Generating FULL meditation audio...")
-                    print(f"ElevenLabs API key present: {bool(elevenlabs_key)}")
-                    print(f"Script length: {len(script)} characters")
+                    print("🎵 === STARTING FULL MEDITATION AUDIO GENERATION ===")
+                    print(f"🔑 ElevenLabs API key present: {bool(elevenlabs_key)}")
+                    print(f"📝 Script length: {len(script)} characters")
+                    print(f"⏱️ Starting audio generation at: {datetime.now().isoformat()}")
                     
                     start_time = time.time()
                     
@@ -104,15 +105,24 @@ class handler(BaseHTTPRequestHandler):
                     generation_time = time.time() - start_time
                     
                     if generation_time > max_audio_time:
-                        print(f"WARNING: Audio generation took {generation_time:.1f}s, may timeout on Vercel")
+                        print(f"⚠️ WARNING: Audio generation took {generation_time:.1f}s")
+                        print(f"⚠️ This is close to Vercel's 5-minute timeout limit!")
                     
-                    print(f"Full audio generated: {len(audio_data) if audio_data else 0} bytes in {generation_time:.1f} seconds")
+                    if audio_data:
+                        print(f"✅ FULL AUDIO GENERATED SUCCESSFULLY!")
+                        print(f"📊 Audio size: {len(audio_data)} bytes ({len(audio_data)/1024/1024:.2f} MB)")
+                        print(f"⏱️ Generation time: {generation_time:.1f} seconds")
+                    else:
+                        print(f"❌ Audio generation returned None/empty data")
+                        
                 except Exception as e:
-                    print(f"Audio generation failed: {e}")
+                    print(f"❌ AUDIO GENERATION FAILED: {e}")
+                    print(f"🔍 Error type: {type(e).__name__}")
                     import traceback
-                    print("Full traceback:")
+                    print("📝 Full error traceback:")
                     traceback.print_exc()
                     # Continue without audio rather than failing completely
+                    audio_data = None
 
             # Success response
             response = {
@@ -433,13 +443,31 @@ Namaste."""
     def generate_full_audio(self, script, api_key):
         """Generate complete audio for the entire meditation"""
         try:
-            print(f"Attempting to import ElevenLabs...")
-            from elevenlabs.client import ElevenLabs
-            print("ElevenLabs imported successfully")
+            print(f"=== STARTING FULL AUDIO GENERATION ===")
+            print(f"Script length: {len(script)} characters")
+            print(f"API key provided: {bool(api_key)}")
+            print(f"API key length: {len(api_key) if api_key else 0}")
             
-            print(f"Initializing ElevenLabs client with API key length: {len(api_key)}")
-            client = ElevenLabs(api_key=api_key)
-            print("ElevenLabs client initialized")
+            # Test import before attempting client initialization
+            print(f"Attempting to import ElevenLabs...")
+            try:
+                from elevenlabs.client import ElevenLabs
+                print("✅ ElevenLabs imported successfully")
+            except ImportError as import_error:
+                print(f"❌ IMPORT ERROR: {import_error}")
+                print("Available packages:")
+                import sys
+                print([pkg for pkg in sys.modules.keys() if 'eleven' in pkg.lower()])
+                raise
+            
+            print(f"Initializing ElevenLabs client...")
+            try:
+                client = ElevenLabs(api_key=api_key)
+                print("✅ ElevenLabs client initialized successfully")
+            except Exception as client_error:
+                print(f"❌ CLIENT INITIALIZATION ERROR: {client_error}")
+                print(f"API key starts with: {api_key[:10]}..." if api_key else "No API key")
+                raise
             
             # Clean the script for TTS
             import re
@@ -471,10 +499,14 @@ Namaste."""
             
             # Generate audio for each chunk
             audio_parts = []
+            total_bytes = 0
+            
             for i, chunk in enumerate(chunks):
-                print(f"Generating chunk {i+1}/{len(chunks)} ({len(chunk)} chars)...")
+                print(f"🎵 Generating chunk {i+1}/{len(chunks)} ({len(chunk)} chars)...")
+                chunk_start_time = time.time()
                 
                 try:
+                    print(f"  📤 Sending chunk to ElevenLabs API...")
                     audio_iterator = client.text_to_speech.convert(
                         voice_id="7nFoun39JV8WgdJ3vGmC",  # Calm meditation voice
                         text=chunk,
@@ -486,24 +518,44 @@ Namaste."""
                             "use_speaker_boost": True
                         }
                     )
+                    print(f"  📥 Received audio iterator from API")
                     
+                    print(f"  🔄 Converting audio iterator to bytes...")
                     audio_data = b"".join(list(audio_iterator))
                     audio_parts.append(audio_data)
-                    print(f"  Chunk {i+1} generated: {len(audio_data)} bytes")
+                    total_bytes += len(audio_data)
+                    
+                    chunk_time = time.time() - chunk_start_time
+                    print(f"  ✅ Chunk {i+1} SUCCESS: {len(audio_data)} bytes in {chunk_time:.1f}s")
                     
                 except Exception as chunk_error:
-                    print(f"  ERROR in chunk {i+1}: {chunk_error}")
+                    print(f"  ❌ ERROR in chunk {i+1}: {chunk_error}")
+                    print(f"  📝 Chunk preview: {chunk[:100]}..." if chunk else "Empty chunk")
+                    import traceback
+                    print(f"  🔍 Full traceback:")
+                    traceback.print_exc()
                     raise
                 
                 # Small delay to avoid rate limiting
                 time.sleep(0.5)
             
             # Combine all audio parts
-            print("Combining audio chunks...")
+            print(f"🔗 Combining {len(audio_parts)} audio chunks...")
+            print(f"📊 Total audio bytes generated: {total_bytes:,}")
+            
             full_audio = b"".join(audio_parts)
+            final_size = len(full_audio)
+            
+            print(f"✅ AUDIO GENERATION COMPLETE!")
+            print(f"📈 Final audio size: {final_size:,} bytes ({final_size/1024/1024:.2f} MB)")
+            print(f"🎯 Audio duration estimate: ~{final_size/32000:.1f} minutes")
             
             return full_audio
 
         except Exception as e:
-            print(f"Full audio generation error: {e}")
+            print(f"❌ FULL AUDIO GENERATION FAILED: {e}")
+            print(f"🔍 Error type: {type(e).__name__}")
+            import traceback
+            print("📝 Complete error traceback:")
+            traceback.print_exc()
             raise
