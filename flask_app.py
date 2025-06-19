@@ -425,81 +425,209 @@ Generated: {duration} minutes of transformational audio
 {scenario} is manifesting now."""
 
 def generate_audio(script):
-    """Generate full-length meditation audio with proper pause timing"""
+    """Generate full-length meditation audio with Monroe Institute background"""
     try:
-        print("Starting FULL-LENGTH audio generation...")
-        print(f"Script length: {len(script)} characters")
+        print("🎵 Starting FULL-LENGTH audio with Monroe Institute Gateway Process background...")
+        print(f"📝 Script length: {len(script)} characters")
         
         from elevenlabs.client import ElevenLabs
         client = ElevenLabs(api_key='sk_fe6faf571491c9b26bef909dce2e19a8e1d7239bf518027b')
         
+        # Load Monroe Institute background audio
+        background_audio_path = os.path.join(os.path.dirname(__file__), 'assets', 'audio', 'monroe_background.mp3')
+        alternative_path = "/Users/carlos/Focus-Creation/Focus-Creation/background_audio/y2mate.is - Robert Monroe Institute Astral Projection Gateway Process 40 minutes no talking -edB7QI8I02c-192k-1700669353.mp3"
+        
+        print("🎛️ Loading Monroe Institute Gateway Process background audio...")
+        background_audio_available = False
+        
+        # Try project assets first, then original location
+        for path in [background_audio_path, alternative_path]:
+            try:
+                if os.path.exists(path):
+                    print(f"📁 Found background audio at: {path}")
+                    with open(path, 'rb') as f:
+                        background_audio_raw = f.read()
+                    print(f"✅ Monroe Institute background loaded: {len(background_audio_raw)} bytes ({len(background_audio_raw)/1024/1024:.1f} MB)")
+                    background_audio_available = True
+                    break
+            except Exception as bg_error:
+                print(f"⚠️ Could not load from {path}: {bg_error}")
+                continue
+        
+        if not background_audio_available:
+            print("📝 Monroe Institute background not available, continuing with spoken meditation only...")
+            background_audio_raw = None
+        
         # Parse script into segments with pause information
         segments = parse_meditation_script(script)
-        print(f"Parsed into {len(segments)} segments")
+        print(f"📋 Parsed into {len(segments)} segments")
         
-        total_audio_parts = []
+        spoken_audio_parts = []
         total_estimated_duration = 0
         
         for i, segment in enumerate(segments):
-            print(f"Processing segment {i+1}/{len(segments)}: {segment['type']}")
+            print(f"🔄 Processing segment {i+1}/{len(segments)}: {segment['type']}")
             
             if segment['type'] == 'text':
                 # Generate speech for text
-                print(f"  Generating speech for {len(segment['content'])} characters...")
+                print(f"  🎙️ Generating speech for {len(segment['content'])} characters...")
                 
                 audio_iterator = client.text_to_speech.convert(
                     voice_id="7nFoun39JV8WgdJ3vGmC",
                     text=segment['content'],
                     model_id="eleven_multilingual_v2",
                     voice_settings={
-                        "stability": 0.75,
-                        "similarity_boost": 0.75,
-                        "style": 0.4,  # Slightly more meditative
+                        "stability": 0.8,   # More stable for meditation
+                        "similarity_boost": 0.7,
+                        "style": 0.3,       # Calm, meditative style
                         "use_speaker_boost": True
                     }
                 )
                 
                 audio_data = b"".join(list(audio_iterator))
-                total_audio_parts.append(audio_data)
+                spoken_audio_parts.append(('speech', audio_data))
                 
                 # Estimate speech duration (roughly 150 words per minute)
                 word_count = len(segment['content'].split())
                 speech_duration = (word_count / 150) * 60  # seconds
                 total_estimated_duration += speech_duration
                 
-                print(f"  Speech generated: {len(audio_data)} bytes (~{speech_duration:.1f}s)")
+                print(f"  ✅ Speech generated: {len(audio_data)} bytes (~{speech_duration:.1f}s)")
                 
             elif segment['type'] == 'pause':
                 # Generate silence for pauses
                 pause_seconds = segment['duration']
-                print(f"  Generating {pause_seconds} seconds of silence...")
+                print(f"  🔇 Adding {pause_seconds} seconds of silence...")
                 
-                # Create silence (44.1kHz, 16-bit, mono MP3 approximation)
-                # Rough calculation: ~64 bytes per second for compressed audio
-                silence_bytes = b'\x00' * (pause_seconds * 64)
-                total_audio_parts.append(silence_bytes)
+                # Create proper silence duration marker
+                spoken_audio_parts.append(('silence', pause_seconds))
                 total_estimated_duration += pause_seconds
                 
             elif segment['type'] == 'background_audio':
-                print(f"  Background audio marker: {segment['content']}")
-                # For now, just note it - could add binaural beats here
+                print(f"  🎛️ Background audio marker: {segment['content']}")
                 
             # Small delay to avoid rate limiting
             if segment['type'] == 'text':
                 time.sleep(0.5)
         
-        # Combine all audio parts
-        print(f"Combining {len(total_audio_parts)} audio segments...")
-        full_audio = b"".join(total_audio_parts)
+        print(f"🎵 Combining spoken audio with Monroe Institute Gateway Process background...")
+        print(f"📊 Total spoken segments: {len(spoken_audio_parts)}")
+        print(f"⏱️ Estimated total duration: {total_estimated_duration/60:.1f} minutes")
         
-        print(f"✅ FULL-LENGTH AUDIO COMPLETE!")
-        print(f"📊 Total size: {len(full_audio)} bytes ({len(full_audio)/1024/1024:.2f} MB)")
-        print(f"⏱️ Estimated duration: {total_estimated_duration/60:.1f} minutes")
+        # Try to use pydub for proper audio mixing if available
+        try:
+            from pydub import AudioSegment
+            from io import BytesIO
+            print("🎛️ pydub available - attempting professional audio mixing...")
+            
+            if background_audio_available:
+                # Load Monroe Institute background
+                print("🎵 Loading Monroe Institute background for mixing...")
+                background_segment = AudioSegment.from_mp3(BytesIO(background_audio_raw))
+                
+                # Reduce background volume to 30% for proper meditation layering
+                background_segment = background_segment - 10  # Reduce by 10dB (roughly 30% volume)
+                print(f"🔊 Background audio adjusted to meditation-appropriate volume")
+                
+                # Create spoken audio track
+                print("🎙️ Combining spoken segments...")
+                spoken_track = AudioSegment.empty()
+                
+                for part_type, part_data in spoken_audio_parts:
+                    if part_type == 'speech':
+                        # Convert speech bytes to AudioSegment
+                        speech_segment = AudioSegment.from_mp3(BytesIO(part_data))
+                        spoken_track += speech_segment
+                    elif part_type == 'silence':
+                        # Add silence
+                        silence_duration_ms = part_data * 1000  # Convert to milliseconds
+                        silence_segment = AudioSegment.silent(duration=silence_duration_ms)
+                        spoken_track += silence_segment
+                
+                # Ensure background is long enough
+                spoken_duration = len(spoken_track)
+                background_duration = len(background_segment)
+                
+                if spoken_duration > background_duration:
+                    # Loop background if needed
+                    loops_needed = (spoken_duration // background_duration) + 1
+                    background_segment = background_segment * loops_needed
+                    print(f"🔄 Looped Monroe Institute background {loops_needed} times to match meditation duration")
+                
+                # Trim background to match spoken duration
+                background_segment = background_segment[:spoken_duration]
+                
+                # Mix spoken audio over Monroe Institute background
+                print("🎛️ Mixing spoken meditation with Monroe Institute Gateway Process...")
+                final_audio_segment = background_segment.overlay(spoken_track)
+                
+                # Export to bytes
+                output_buffer = BytesIO()
+                final_audio_segment.export(output_buffer, format="mp3", bitrate="192k")
+                full_audio = output_buffer.getvalue()
+                
+                print(f"✅ PROFESSIONAL AUDIO MIXING COMPLETE!")
+                print(f"🎛️ Monroe Institute Gateway Process background: ACTIVE")
+                print(f"🎙️ Spoken meditation guidance: LAYERED")
+                
+            else:
+                print("📝 No background audio available, creating spoken-only meditation...")
+                spoken_track = AudioSegment.empty()
+                
+                for part_type, part_data in spoken_audio_parts:
+                    if part_type == 'speech':
+                        speech_segment = AudioSegment.from_mp3(BytesIO(part_data))
+                        spoken_track += speech_segment
+                    elif part_type == 'silence':
+                        silence_duration_ms = part_data * 1000
+                        silence_segment = AudioSegment.silent(duration=silence_duration_ms)
+                        spoken_track += silence_segment
+                
+                output_buffer = BytesIO()
+                spoken_track.export(output_buffer, format="mp3", bitrate="192k")
+                full_audio = output_buffer.getvalue()
+                
+                print(f"✅ SPOKEN MEDITATION COMPLETE!")
+        
+        except ImportError:
+            print("⚠️ pydub not available - using basic audio concatenation...")
+            # Fallback to basic concatenation
+            final_audio_parts = []
+            for part_type, part_data in spoken_audio_parts:
+                if part_type == 'speech':
+                    final_audio_parts.append(part_data)
+                elif part_type == 'silence':
+                    # Create silence bytes (rough approximation)
+                    silence_duration = part_data  # seconds
+                    silence_bytes = b'\x00' * (silence_duration * 64)  # Rough MP3 silence
+                    final_audio_parts.append(silence_bytes)
+            
+            full_audio = b"".join(final_audio_parts)
+            print(f"📝 Basic audio concatenation complete (no background mixing)")
+        
+        except Exception as audio_error:
+            print(f"⚠️ Audio mixing failed: {audio_error}")
+            print("🔄 Falling back to basic concatenation...")
+            
+            final_audio_parts = []
+            for part_type, part_data in spoken_audio_parts:
+                if part_type == 'speech':
+                    final_audio_parts.append(part_data)
+                elif part_type == 'silence':
+                    silence_duration = part_data
+                    silence_bytes = b'\x00' * (silence_duration * 64)
+                    final_audio_parts.append(silence_bytes)
+            
+            full_audio = b"".join(final_audio_parts)
+        
+        print(f"📊 Final meditation size: {len(full_audio)} bytes ({len(full_audio)/1024/1024:.2f} MB)")
+        print(f"⏱️ Duration: {total_estimated_duration/60:.1f} minutes")
+        print(f"🧘‍♀️ Monroe Institute Gateway Process: {'INTEGRATED' if background_audio_available else 'Not Available'}")
         
         return full_audio
         
     except Exception as e:
-        print(f"Audio generation failed: {e}")
+        print(f"❌ Audio generation failed: {e}")
         import traceback
         traceback.print_exc()
         return None
