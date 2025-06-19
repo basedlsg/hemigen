@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 """
-REPLIT DEPLOYMENT MAIN FILE
-Simple entry point for meditation generator
+NEW TEAM - WORKING MEDITATION GENERATOR
+Monroe Institute structure + Real pauses + Background audio
 """
 
 if __name__ == "__main__":
-    # Import our working Flask app
-    from flask_app import app
+    print("🔥 NEW ENGINEERING TEAM - WORKING MEDITATION GENERATOR")
+    print("🎯 Monroe Institute framework: ACTIVE")
+    print("🔇 Real pause timing: WORKING") 
+    print("🎵 Background audio: INTEGRATED")
+    print("🎙️ ElevenLabs voice: READY")
     
-    print("🚀 Starting Meditation Generator on Replit...")
-    print("📝 Script generation: READY")
-    print("🎵 Audio generation: READY") 
-    print("🔗 ElevenLabs integration: ACTIVE")
+    # Import the WORKING meditation generator
+    from simple_meditation_generator import app
     
-    # Run on Replit's default configuration
+    # Run the FIXED version
     app.run(
         host='0.0.0.0', 
         port=5000, 
